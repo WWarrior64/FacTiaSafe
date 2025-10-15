@@ -1,5 +1,6 @@
 package sv.edu.catolica.factiasafe;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -63,5 +64,10 @@ public class FacturaActivity extends AppCompatActivity {
 
             isMenuOpen = true;
         }
+    }
+
+    public void ImportarPDF(View view) {
+        Intent ventana = new Intent(FacturaActivity.this, ImportPdfActivity.class);
+        startActivity(ventana);
     }
 }

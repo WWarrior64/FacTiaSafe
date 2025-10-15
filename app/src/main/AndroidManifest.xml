@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FacTiaSafe">
         <activity
+            android:name=".ImportPdfActivity"
+            android:exported="false" />
+        <activity
             android:name=".FacturaActivity"
             android:exported="false" />
         <activity

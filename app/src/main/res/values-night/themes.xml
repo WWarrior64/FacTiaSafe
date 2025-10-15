@@ -3,7 +3,7 @@
     <style name="Theme.FacTiaSafe" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">#3B65F8</item>
-        <item name="colorPrimaryVariant">#00127E</item>
+        <item name="colorPrimaryVariant">#0014B6</item>
         <item name="colorOnPrimary">#262626</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -12,5 +12,6 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="colorOnTertiary">#2F2F2F</item>
     </style>
 </resources>
