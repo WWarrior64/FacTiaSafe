@@ -123,6 +123,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Escanear"
+            android:onClick="abrirEscanear"
             app:icon="@drawable/ic_scan"
             style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
             android:padding="8dp"

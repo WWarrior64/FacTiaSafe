@@ -7,4 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".SplashActivity">
 
+    <androidx.cardview.widget.CardView
+        android:layout_width="163dp"
+        android:layout_height="150dp"
+        app:cardCornerRadius="45dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/logoapp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/logo_app"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo_factia_safe" />
+
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
