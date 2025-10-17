@@ -110,4 +110,8 @@ public class FacturaActivity extends AppCompatActivity {
     }
 
 
+    public void EntradaManual(View view) {
+        Intent ventana = new Intent(this, EntradaManualActivity.class);
+        startActivity(ventana);
+    }
 }

@@ -99,6 +99,7 @@
             app:icon="@drawable/ic_edit"
             style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
             android:padding="8dp"
+            android:onClick="EntradaManual"
             android:backgroundTint="?attr/colorOnPrimary"
             android:textColor="?attr/colorPrimary"
             app:cornerRadius="24dp"

@@ -13,5 +13,6 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
         <item name="colorOnTertiary">#2F2F2F</item>
+        <item name="colorOnSecondaryFixed">#BDBDBD</item>
     </style>
 </resources>

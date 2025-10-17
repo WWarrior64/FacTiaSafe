@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FacTiaSafe">
         <activity
+            android:name=".EntradaManualActivity"
+            android:exported="false" />
+        <activity
             android:name=".AcercaDeActivity"
             android:exported="false" />
         <activity
