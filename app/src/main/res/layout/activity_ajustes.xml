@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="?attr/colorOnPrimary"
     tools:context=".AjustesActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,6 +24,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="16dp"
             android:src="@drawable/ic_arrow_back"
+            app:tint="?attr/colorOnSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -36,7 +37,7 @@
             android:text="@string/encabezado_ajustes"
             android:textSize="18sp"
             android:textStyle="normal"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorOnSecondary"
             app:layout_constraintStart_toEndOf="@id/boton_volver"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -65,7 +66,7 @@
                 android:layout_marginTop="8dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/fondo_tarjeta_ajuste"
+                app:cardBackgroundColor="?attr/colorOnTertiary"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -96,14 +97,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/notificaciones_ajustes2"
-                            android:textColor="@android:color/black"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/notificacion_ajustes3"
-                            android:textColor="#616161"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -116,7 +117,7 @@
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/fondo_tarjeta_ajuste"
+                app:cardBackgroundColor="?attr/colorOnTertiary"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -147,14 +148,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/preferencias_ajustes"
-                            android:textColor="@android:color/black"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/preferencias_ajustes2"
-                            android:textColor="#616161"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -167,7 +168,7 @@
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/fondo_tarjeta_ajuste"
+                app:cardBackgroundColor="?attr/colorOnTertiary"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
@@ -198,14 +199,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/seguridad_ajustes2"
-                            android:textColor="@android:color/black"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/seguridad_ajustes3"
-                            android:textColor="#616161"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -218,7 +219,7 @@
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/fondo_tarjeta_ajuste"
+                app:cardBackgroundColor="?attr/colorOnTertiary"
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="abrirAcercaDe"
@@ -250,14 +251,14 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/acercade_ajustes"
-                            android:textColor="@android:color/black"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/acercade_ajustes2"
-                            android:textColor="#616161"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -270,11 +271,10 @@
                 android:layout_marginTop="48dp"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/boton_cache3"
-                android:backgroundTint="@color/azul_principal"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:text="@string/btn_cache"
-                android:textColor="@android:color/white"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 tools:ignore="VisualLintButtonSize" />

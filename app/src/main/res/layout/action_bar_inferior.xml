@@ -9,7 +9,7 @@
     android:orientation="horizontal"
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
-    android:background="@android:color/white">
+    android:background="?attr/colorOnPrimary">
     <Space
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -31,14 +31,14 @@
             android:src="@drawable/ic_editar4"
             android:background="@drawable/circulo_moradoclaro"
             android:padding="12dp"
-            app:tint="@color/morado_principal"
+            app:tint="?attr/colorPrimary"
             tools:ignore="ContentDescription" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/editar_editarfactura"
             android:textSize="12sp"
-            android:textColor="@color/morado_principal"/>
+            android:textColor="?attr/colorPrimary"/>
     </LinearLayout>
 
     <Space
@@ -62,14 +62,14 @@
             android:background="@drawable/circulo_moradoclaro"
             android:padding="12dp"
             android:src="@drawable/ic_pdf4"
-            app:tint="@color/morado_principal"
+            app:tint="?attr/colorPrimary"
             tools:ignore="ContentDescription,ImageContrastCheck" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pdf_editarfactura"
             android:textSize="12sp"
-            android:textColor="@color/morado_principal"/>
+            android:textColor="?attr/colorPrimary"/>
     </LinearLayout>
 
     <Space
@@ -93,14 +93,14 @@
             android:src="@drawable/ic_detalles4"
             android:background="@drawable/circulo_moradoclaro"
             android:padding="12dp"
-            app:tint="@color/morado_principal"
+            app:tint="?attr/colorPrimary"
             tools:ignore="ContentDescription" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/detalles_editarfactura"
             android:textSize="12sp"
-            android:textColor="@color/morado_principal"/>
+            android:textColor="?attr/colorPrimary"/>
     </LinearLayout>
 
     <Space

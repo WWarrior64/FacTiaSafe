@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="?attr/colorOnPrimary"
     tools:context=".AcercaDeActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,6 +23,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="16dp"
             android:src="@drawable/ic_arrow_back"
+            app:tint="?attr/colorOnSecondary"
             android:onClick="VolverAjustes"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +36,7 @@
             android:layout_height="wrap_content"
             android:text="@string/acercade_encabezado"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorOnSecondary"
             android:textStyle="normal"
             app:layout_constraintStart_toEndOf="@id/boton_volver"
             app:layout_constraintTop_toTopOf="parent"
@@ -65,7 +66,7 @@
                 android:layout_marginTop="8dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/white">
+                app:cardBackgroundColor="?attr/colorOnPrimary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -92,7 +93,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:text="@string/nombreapp"
-                            android:textColor="@android:color/black"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="18sp"
                             android:textStyle="normal" />
                     </LinearLayout>
@@ -100,7 +101,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/gris_claro_fondo"
+                        android:background="?attr/colorOnTertiary"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"/>
 
@@ -116,23 +117,24 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/version_acercade"
-                            android:textColor="@android:color/black"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/texto_version"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:text="@string/version_acercade2"
-                            android:textColor="@color/gris_texto_secundario"
+                            android:textColor="?attr/colorOnSecondaryFixed"
                             android:textSize="14sp"
-                            android:layout_marginTop="4dp"/>
+                            tools:ignore="TextContrastCheck" />
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/gris_claro_fondo"
+                        android:background="?attr/colorOnTertiary"
                         android:layout_marginTop="16dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"/>
@@ -149,17 +151,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/id_acercade"
-                            android:textColor="@android:color/black"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/texto_id_interno"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:text="@string/id_acercade2"
-                            android:textColor="@color/gris_texto_secundario"
+                            android:textColor="?attr/colorOnSecondaryFixed"
                             android:textSize="14sp"
-                            android:layout_marginTop="4dp"/>
+                            tools:ignore="TextContrastCheck" />
                     </LinearLayout>
 
                 </LinearLayout>

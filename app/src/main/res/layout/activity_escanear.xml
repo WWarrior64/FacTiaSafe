@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="?attr/colorOnPrimary"
     tools:context=".EscanearActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -23,6 +23,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="16dp"
             android:src="@drawable/ic_arrow_back"
+            app:tint="?attr/colorOnSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -34,7 +35,7 @@
             android:layout_height="wrap_content"
             android:text="@string/encabezado_escanear"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorOnSecondary"
             android:textStyle="normal"
             app:layout_constraintStart_toEndOf="@id/boton_volver"
             app:layout_constraintTop_toTopOf="parent"
@@ -47,7 +48,7 @@
         android:id="@+id/divisor_encabezado"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="@color/gris_claro_fondo"
+        android:background="?attr/colorOnTertiary"
         app:layout_constraintTop_toBottomOf="@id/layout_encabezado"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -76,7 +77,7 @@
             android:stateListAnimator="@null"
             android:text="@string/selector_opcion1"
             android:textAllCaps="false"
-            android:textColor="@android:color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="14sp"
             tools:ignore="ButtonStyle,TouchTargetSizeCheck,VisualLintButtonSize"/>
 
@@ -90,9 +91,9 @@
             android:stateListAnimator="@null"
             android:text="@string/selector_opcion2"
             android:textAllCaps="false"
-            android:textColor="#616161"
+            android:textColor="?attr/colorOnSecondaryFixed"
             android:textSize="14sp"
-            tools:ignore="ButtonStyle,TouchTargetSizeCheck,VisualLintButtonSize" />
+            tools:ignore="ButtonStyle,TouchTargetSizeCheck,VisualLintButtonSize,TextContrastCheck" />
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -115,7 +116,7 @@
             <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
+            app:cardCornerRadius="8dp" app:cardBackgroundColor="@android:color/transparent"
             app:cardElevation="0dp"
             android:layout_marginBottom="16dp">
 
@@ -150,15 +151,16 @@
                     android:layout_height="32dp"
                     android:layout_marginEnd="8dp"
                     android:src="@drawable/ic_camara_mas4"
-                    app:tint="@color/gris_inactivo"
+                    app:tint="?attr/colorOnSecondaryFixed"
                     tools:ignore="ContentDescription,ImageContrastCheck" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/agregar_vistaescanear"
-                    android:textColor="#757575"
-                    android:textSize="16sp" />
+                    android:textColor="?attr/colorOnSecondaryFixed"
+                    android:textSize="16sp"
+                    tools:ignore="TextContrastCheck" />
 
             </LinearLayout>
 
