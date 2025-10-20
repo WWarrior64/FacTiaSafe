@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorOnTertiary"
     android:id="@+id/main"
     tools:context=".FacturaActivity">
 
@@ -12,13 +13,14 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorOnPrimary"
+        app:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorOnPrimary"
             app:title="Facturas"
             app:titleTextColor="?attr/colorOnSecondary">
 
@@ -35,38 +37,81 @@
                 app:tint="?attr/colorOnSecondary" />
         </androidx.appcompat.widget.Toolbar>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/filter_tab_layout"
+        <HorizontalScrollView
+            android:id="@+id/filter_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabMode="scrollable"
-            app:tabGravity="fill">
+            android:scrollbars="none"
+            android:paddingBottom="8dp">
 
-            <com.google.android.material.tabs.TabItem
+            <LinearLayout
+                android:id="@+id/filter_chip_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="A/Z" />
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Recientes" />
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Antiguos" />
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Este mes" />
-        </com.google.android.material.tabs.TabLayout>
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:gravity="center_vertical">
 
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_az"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="A/Z"
+                    app:chipBackgroundColor="?attr/colorPrimary"
+                    android:textColor="?attr/colorOnPrimary"
+                    app:chipCornerRadius="8dp"
+                    app:chipStrokeWidth="0dp"
+                    style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_recientes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Recientes"
+                    app:chipBackgroundColor="@android:color/transparent"
+                    android:textColor="?attr/colorOnSecondary"
+                    app:chipCornerRadius="8dp"
+                    app:chipStrokeColor="?attr/colorOnSecondaryFixed"
+                    app:chipStrokeWidth="1dp"
+                    style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_antiguos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Antiguos"
+                    app:chipBackgroundColor="@android:color/transparent"
+                    android:textColor="?attr/colorOnSecondary"
+                    app:chipCornerRadius="8dp"
+                    app:chipStrokeColor="?attr/colorOnSecondaryFixed"
+                    app:chipStrokeWidth="1dp"
+                    style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_este_mes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Este mes"
+                    app:chipBackgroundColor="@android:color/transparent"
+                    android:textColor="?attr/colorOnSecondary"
+                    app:chipCornerRadius="8dp"
+                    app:chipStrokeColor="?attr/colorOnSecondaryFixed"
+                    app:chipStrokeWidth="1dp"
+                    style="@style/Widget.MaterialComponents.Chip.Filter" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
     </com.google.android.material.appbar.AppBarLayout>
 
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"
+        android:background="?attr/colorOnSecondaryFixed"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -141,8 +186,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:src="@drawable/ic_add"
-        app:backgroundTint="@color/purple_500"
-        app:tint="@android:color/white"
+        app:backgroundTint="?attr/colorPrimary"
+        app:tint="?attr/colorOnPrimary"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="Menú de acciones" />
