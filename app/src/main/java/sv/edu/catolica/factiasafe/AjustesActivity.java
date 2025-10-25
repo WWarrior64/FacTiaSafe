@@ -32,4 +32,9 @@ public class AjustesActivity extends AppCompatActivity {
     public void VolverFacturas(View view) {
         finish();
     }
+
+    public void abrirPreferenciasPdfExportar(View view) {
+        Intent ventana = new Intent(AjustesActivity.this, PreferenciasPdfActivity.class);
+        startActivity(ventana);
+    }
 }

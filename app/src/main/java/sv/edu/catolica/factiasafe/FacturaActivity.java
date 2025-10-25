@@ -1,6 +1,8 @@
 package sv.edu.catolica.factiasafe;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.google.android.material.chip.Chip;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -93,15 +96,36 @@ public class FacturaActivity extends BaseActivity {
     }
 
     private void handleChipSelection(Chip newSelectedChip) {
-        // Lógica para cambiar la apariencia de los chips (requiere los IDs de color en colors.xml)
-        if (selectedChip != null) {
-            selectedChip.setChipBackgroundColorResource(android.R.color.transparent);
-            // Si no tienes R.color.colorOnSecondaryFixed, usa android.R.color.darker_gray temporalmente
-            selectedChip.setChipStrokeColorResource(R.color.gris_inactivo);
-            selectedChip.setTextColor(ContextCompat.getColor(this, R.color.white));
+        int fallbackStroke = ContextCompat.getColor(this, R.color.gris_inactivo);
+        int fallbackOnPrimary = ContextCompat.getColor(this, R.color.white);
+        int transparent = Color.TRANSPARENT;
+
+        // Resuelve colores desde el tema usando MaterialColors (usa el chip como view)
+        int colorPrimary = MaterialColors.getColor(newSelectedChip, androidx.appcompat.R.attr.colorPrimary);
+        // intenta resolver colorOnPrimary, si no existe usa fallback
+        int colorOnPrimary;
+        try {
+            colorOnPrimary = MaterialColors.getColor(newSelectedChip, com.google.android.material.R.attr.colorOnPrimary);
+        } catch (Exception e) {
+            colorOnPrimary = fallbackOnPrimary;
         }
 
-        newSelectedChip.setChipBackgroundColorResource(R.color.azul_principal);
+        int strokeColor;
+        try {
+            strokeColor = MaterialColors.getColor(newSelectedChip, com.google.android.material.R.attr.colorOnSecondary);
+        } catch (Exception e) {
+            strokeColor = fallbackStroke;
+        }
+
+        // Deseleccionar chip anterior
+        if (selectedChip != null) {
+            selectedChip.setChipBackgroundColor(ColorStateList.valueOf(transparent));
+            selectedChip.setChipStrokeColor(ColorStateList.valueOf(strokeColor));
+            selectedChip.setTextColor(ColorStateList.valueOf(strokeColor));
+        }
+
+        // Seleccionar nuevo chip
+        newSelectedChip.setChipBackgroundColor(ColorStateList.valueOf(colorPrimary));
         newSelectedChip.setChipStrokeWidth(0f);
         newSelectedChip.setTextColor(ContextCompat.getColor(this, R.color.white));
 

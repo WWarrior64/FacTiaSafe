@@ -118,6 +118,7 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="?attr/colorOnTertiary"
+                android:onClick="abrirPreferenciasPdfExportar"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground">
