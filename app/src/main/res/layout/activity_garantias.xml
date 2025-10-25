@@ -1,50 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:id="@+id/main"
-    android:background="?attr/colorOnTertiary"
-    tools:context=".GarantiasActivity">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" android:background="?attr/colorOnTertiary">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <HorizontalScrollView
+        android:id="@+id/filter_scroll_view_garantias"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorOnPrimary"
-        app:elevation="0dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Garantías"
-            app:titleTextColor="?attr/colorOnSecondary"
-            app:navigationIcon="@drawable/ic_arrow_back">
-
-            <ImageButton
-                android:id="@+id/button_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Buscar Factura"
-                android:padding="8dp"
-                android:src="@drawable/ic_search"
-                app:tint="?attr/colorOnSecondary" />
-
-        </androidx.appcompat.widget.Toolbar>
+        android:scrollbars="none"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/layout_filters"
-            android:layout_width="match_parent"
+            android:id="@+id/filter_chip_container_garantias"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="8dp"
             android:gravity="center_vertical">
 
             <com.google.android.material.chip.Chip
@@ -96,47 +73,26 @@
                 app:chipStrokeColor="?attr/colorOnSecondaryFixed"
                 app:chipStrokeWidth="1dp"
                 style="@style/Widget.MaterialComponents.Chip.Filter" />
-
         </LinearLayout>
+    </HorizontalScrollView>
 
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
+    <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="1dp"
+        android:background="?attr/colorOnSecondaryFixed"
+        app:layout_constraintTop_toBottomOf="@id/filter_scroll_view_garantias" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_garantias"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:clipToPadding="false"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_garantia" />
-
-    </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="90dp"
-        android:contentDescription="Agregar Nueva Factura"
-        android:src="@drawable/ic_add"
-        app:tint="?attr/colorOnPrimary"
-        app:backgroundTint="?attr/colorPrimary" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_garantias"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?attr/colorOnPrimary"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu" />
+        android:layout_height="0dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="64dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:listitem="@layout/item_garantia" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

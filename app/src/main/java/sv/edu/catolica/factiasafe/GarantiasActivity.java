@@ -20,55 +20,47 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class GarantiasActivity extends AppCompatActivity {
+public class GarantiasActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
-    private BottomNavigationView bottomNavigationView;
     private Chip selectedChip;
+
+    // Eliminado el método onOptionsItemSelected() ya que el manejo del botón UP/Home se hará en BaseActivity.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_garantias);
+        setActivityLayout(R.layout.activity_garantias);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // 1. Configuración de la Toolbar y navegación
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        // Configuración de la Toolbar (métodos heredados)
+        setToolbarTitle("Garantías");
+        showUpButton(false);
+
+        ImageButton searchButton = toolbar.findViewById(R.id.search_button);
+
+        if (searchButton != null) {
+            searchButton.setOnClickListener(v -> handleSearchClick());
         }
 
-        ImageButton searchButton = findViewById(R.id.button_search);
-        searchButton.setOnClickListener(v -> handleSearchClick());
-
-        // 2. Configuración de Chips de Filtro
-        setupFilterChips();
-
-        // 3. Configuración del RecyclerView
         recyclerView = findViewById(R.id.recycler_garantias);
         setupRecyclerView();
 
-        // 4. Configuración del FAB (asumiendo que en Garantias solo abre una acción principal)
-        FloatingActionButton fabAdd = findViewById(R.id.fab_add);
-        fabAdd.setOnClickListener(v -> handleFabClick());
+        // Aquí no hay submenú FAB, el FAB solo lanza una acción.
 
-        // 5. Configuración de la Navegación Inferior
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        setupBottomNavigation();
-
-        // Inicializar el filtro "A/Z" como seleccionado
         Chip chipAz = findViewById(R.id.chip_az);
-        // Si el chip Az existe, lo seleccionamos al inicio
-        if (chipAz != null) {
-            handleChipSelection(chipAz);
-        }
+        if (chipAz != null) handleChipSelection(chipAz);
+    }
+
+    // >> CLAVE 1: Implementar el ID de navegación <<
+    @Override
+    protected int getBottomNavItemId() {
+        return R.id.navigation_garantias;
     }
 
     private void setupFilterChips() {
@@ -113,36 +105,9 @@ public class GarantiasActivity extends AppCompatActivity {
         // Lógica para configurar el RecyclerView: LayoutManager, Adapter y carga inicial.
     }
 
-    private void setupBottomNavigation() {
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.navigation_facturas) {
-                Intent intent = new Intent(this, FacturaActivity.class);
-                // >> CLAVE: Reordenar a la parte frontal si ya existe <<
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
-            } else if (id == R.id.navigation_garantias) {
-                return true; // Ya estamos aquí
-            } else if (id == R.id.navigation_ajustes) {
-                startActivity(new Intent(this, AjustesActivity.class));
-                return true;
-            }
-            return false;
-        });
-        bottomNavigationView.setSelectedItemId(R.id.navigation_garantias);
-    }
-
     private void handleSearchClick() {
         // Lógica para iniciar una nueva actividad de búsqueda o mostrar un campo de búsqueda
         Toast.makeText(this, "Abriendo búsqueda de garantías...", Toast.LENGTH_SHORT).show();
-    }
-
-    private void handleFabClick() {
-        // Acción para agregar una nueva garantía (podría ser un simple Intent a Entrada Manual)
-        Toast.makeText(this, "Abriendo formulario para nueva garantía...", Toast.LENGTH_SHORT).show();
-        // Ejemplo: startActivity(new Intent(this, EntradaManualActivity.class));
     }
 
     // Manejar el botón de retroceso/Up de la Toolbar
@@ -154,4 +119,5 @@ public class GarantiasActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

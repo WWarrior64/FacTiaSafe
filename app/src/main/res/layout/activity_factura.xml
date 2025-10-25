@@ -4,200 +4,92 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorOnTertiary"
     android:id="@+id/main"
-    tools:context=".FacturaActivity">
+    android:layout_height="match_parent" android:background="?attr/colorOnTertiary">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <HorizontalScrollView
+        android:id="@+id/filter_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorOnPrimary"
-        app:elevation="0dp"
+        android:scrollbars="none"
+        android:paddingBottom="8dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Facturas"
-            app:titleTextColor="?attr/colorOnSecondary">
-
-            <ImageButton
-                android:id="@+id/search_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="16dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Buscar factura"
-                android:padding="8dp"
-                android:src="@drawable/ic_search"
-                app:tint="?attr/colorOnSecondary" />
-        </androidx.appcompat.widget.Toolbar>
-
-        <HorizontalScrollView
-            android:id="@+id/filter_scroll_view"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/filter_chip_container"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:paddingBottom="8dp">
-
-            <LinearLayout
-                android:id="@+id/filter_chip_container"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical">
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_az"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:gravity="center_vertical">
+                android:text="A/Z"
+                app:chipBackgroundColor="?attr/colorPrimary"
+                android:textColor="?attr/colorOnPrimary"
+                app:chipCornerRadius="8dp"
+                app:chipStrokeWidth="0dp"
+                style="@style/Widget.MaterialComponents.Chip.Filter" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_az"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="A/Z"
-                    app:chipBackgroundColor="?attr/colorPrimary"
-                    android:textColor="?attr/colorOnPrimary"
-                    app:chipCornerRadius="8dp"
-                    app:chipStrokeWidth="0dp"
-                    style="@style/Widget.MaterialComponents.Chip.Filter" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_recientes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Recientes"
+                app:chipBackgroundColor="@android:color/transparent"
+                android:textColor="?attr/colorOnSecondary"
+                app:chipCornerRadius="8dp"
+                app:chipStrokeColor="?attr/colorOnSecondaryFixed"
+                app:chipStrokeWidth="1dp"
+                style="@style/Widget.MaterialComponents.Chip.Filter" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_recientes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Recientes"
-                    app:chipBackgroundColor="@android:color/transparent"
-                    android:textColor="?attr/colorOnSecondary"
-                    app:chipCornerRadius="8dp"
-                    app:chipStrokeColor="?attr/colorOnSecondaryFixed"
-                    app:chipStrokeWidth="1dp"
-                    style="@style/Widget.MaterialComponents.Chip.Filter" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_antiguos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Antiguos"
+                app:chipBackgroundColor="@android:color/transparent"
+                android:textColor="?attr/colorOnSecondary"
+                app:chipCornerRadius="8dp"
+                app:chipStrokeColor="?attr/colorOnSecondaryFixed"
+                app:chipStrokeWidth="1dp"
+                style="@style/Widget.MaterialComponents.Chip.Filter" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_antiguos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Antiguos"
-                    app:chipBackgroundColor="@android:color/transparent"
-                    android:textColor="?attr/colorOnSecondary"
-                    app:chipCornerRadius="8dp"
-                    app:chipStrokeColor="?attr/colorOnSecondaryFixed"
-                    app:chipStrokeWidth="1dp"
-                    style="@style/Widget.MaterialComponents.Chip.Filter" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_este_mes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Este mes"
-                    app:chipBackgroundColor="@android:color/transparent"
-                    android:textColor="?attr/colorOnSecondary"
-                    app:chipCornerRadius="8dp"
-                    app:chipStrokeColor="?attr/colorOnSecondaryFixed"
-                    app:chipStrokeWidth="1dp"
-                    style="@style/Widget.MaterialComponents.Chip.Filter" />
-
-            </LinearLayout>
-        </HorizontalScrollView>
-    </com.google.android.material.appbar.AppBarLayout>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_este_mes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Este mes"
+                app:chipBackgroundColor="@android:color/transparent"
+                android:textColor="?attr/colorOnSecondary"
+                app:chipCornerRadius="8dp"
+                app:chipStrokeColor="?attr/colorOnSecondaryFixed"
+                app:chipStrokeWidth="1dp"
+                style="@style/Widget.MaterialComponents.Chip.Filter" />
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?attr/colorOnSecondaryFixed"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/filter_scroll_view" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/invoices_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/divider"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
-        tools:listitem="@layout/item_factura"
-        tools:itemCount="5"
-        android:padding="8dp"/>
-
-    <LinearLayout
-        android:id="@+id/fab_menu_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="end"
-        android:visibility="gone"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@id/main_fab"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/manual_input_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Entrada Manual"
-            app:icon="@drawable/ic_edit"
-            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
-            android:padding="8dp"
-            android:onClick="EntradaManual"
-            android:backgroundTint="?attr/colorOnPrimary"
-            android:textColor="?attr/colorPrimary"
-            app:cornerRadius="24dp"
-            android:layout_marginBottom="8dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/import_pdf_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Importar PDF"
-            app:icon="@drawable/ic_file_import"
-            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
-            android:padding="8dp"
-            android:onClick="ImportarPDF"
-            android:backgroundTint="?attr/colorOnPrimary"
-            android:textColor="?attr/colorPrimary"
-            app:cornerRadius="24dp"
-            android:layout_marginBottom="8dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/scan_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Escanear"
-            android:onClick="abrirEscanear"
-            app:icon="@drawable/ic_scan"
-            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
-            android:padding="8dp"
-            android:backgroundTint="?attr/colorOnPrimary"
-            android:textColor="?attr/colorPrimary"
-            app:cornerRadius="24dp"
-            android:layout_marginBottom="8dp"/>
-    </LinearLayout>
-
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/main_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="?attr/colorPrimary"
-        app:tint="?attr/colorOnPrimary"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Menú de acciones" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_nav_menu"
-        app:labelVisibilityMode="labeled"/>
-
+        tools:listitem="@layout/item_factura"
+        android:padding="8dp"
+        android:paddingBottom="64dp"
+        android:clipToPadding="false"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

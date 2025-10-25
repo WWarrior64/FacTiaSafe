@@ -26,98 +26,49 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
 
-public class FacturaActivity extends AppCompatActivity {
+public class FacturaActivity extends BaseActivity {
 
     private RecyclerView recyclerView;
-    private BottomNavigationView bottomNavigationView;
-    private FloatingActionButton mainFab;
-    private LinearLayout fabMenuContainer;
     private Chip selectedChip;
-    private boolean isMenuOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_factura);
+        setActivityLayout(R.layout.activity_factura);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Configuración de la Toolbar (métodos heredados)
+        setToolbarTitle("Facturas");
+        showUpButton(false);
 
-        ImageButton searchButton = findViewById(R.id.search_button);
-        searchButton.setOnClickListener(v -> handleSearchClick());
+        // Inicializa vistas del contenido (que ahora están en activity_factura_content.xml)
+        ImageButton searchButton = toolbar.findViewById(R.id.search_button);
 
-        // 2. Inicialización del FAB y menú
-        mainFab = findViewById(R.id.main_fab);
-        fabMenuContainer = findViewById(R.id.fab_menu_container);
-        fabMenuContainer.setVisibility(View.GONE); // Asegura que esté oculto al inicio
+        if (searchButton != null) {
+            searchButton.setOnClickListener(v -> handleSearchClick());
+        }
 
-        mainFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleFabMenu();
-            }
-        });
-
-        // 3. Configuración de Chips de Filtro
+        // chips y recycler
         setupFilterChips();
-
-        // 4. Configuración del RecyclerView
         recyclerView = findViewById(R.id.invoices_recycler_view);
         setupRecyclerView();
 
-        // 5. Configuración de la Navegación Inferior
-        bottomNavigationView = findViewById(R.id.bottom_nav_view);
-        setupBottomNavigation();
-
-        // Inicializar el filtro "A/Z" como seleccionado
+        // seleccionar A/Z por defecto
         Chip chipAz = findViewById(R.id.chip_az);
-        handleChipSelection(chipAz);
+        if (chipAz != null) handleChipSelection(chipAz);
     }
 
-    private void toggleFabMenu() {
-        if (isMenuOpen) {
-            // Si el menú está abierto: CERRAR
-            fabMenuContainer.setVisibility(View.GONE);
-            // Cambiar el ícono a '+' (ic_add)
-            mainFab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add));
-            isMenuOpen = false;
-        } else {
-            // Si el menú está cerrado: ABRIR
-            fabMenuContainer.setVisibility(View.VISIBLE);
-            // Cambiar el ícono a 'X' (ic_close)
-            mainFab.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_close));
-            isMenuOpen = true;
-        }
+    // >> CLAVE: Implementar el ID de navegación <<
+    @Override
+    protected int getBottomNavItemId() {
+        return R.id.navigation_facturas;
     }
 
-    // Métodos onClick definidos en el XML para los botones del menú FAB (ADAPTADO)
-    public void EntradaManual(View view) {
-        Intent ventana = new Intent(this, EntradaManualActivity.class);
-        startActivity(ventana);
-        toggleFabMenu(); // Cierra el menú después de la acción
-    }
-
-    public void ImportarPDF(View view) {
-        Intent ventana = new Intent(FacturaActivity.this, ImportPdfActivity.class);
-        startActivity(ventana);
-        toggleFabMenu(); // Cierra el menú después de la acción
-    }
-
-    public void abrirEscanear(View view) {
-        Intent ventana = new Intent(FacturaActivity.this, EscanearActivity.class);
-        startActivity(ventana);
-        toggleFabMenu(); // Cierra el menú después de la acción
-    }
-
-    private void abrirAjustes() {
-        Intent intent = new Intent(this, AjustesActivity.class);
-        startActivity(intent);
-    }
+    // >> CLAVE: Implementar el comportamiento del FAB heredado <<
 
     // ------------------------------------
     // --- Manejo de Chips de Filtro (Nuevo) ---
@@ -157,31 +108,6 @@ public class FacturaActivity extends AppCompatActivity {
         selectedChip = newSelectedChip;
     }
 
-    // ------------------------------------
-    // --- Otros métodos ---
-    // ------------------------------------
-
-    private void setupBottomNavigation() {
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.navigation_facturas) {
-                return true; // Ya estamos aquí
-            } else if (id == R.id.navigation_garantias) {
-                Intent intent = new Intent(this, GarantiasActivity.class);
-                // >> CLAVE: Reordenar a la parte frontal si ya existe <<
-                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
-            } else if (id == R.id.navigation_ajustes) {
-                abrirAjustes();
-                return true;
-            }
-            return false;
-        });
-        bottomNavigationView.setSelectedItemId(R.id.navigation_facturas);
-    }
-
     private void setupRecyclerView() {
         // Implementa aquí la configuración de tu RecyclerView, LayoutManager y Adapter
     }
@@ -190,4 +116,5 @@ public class FacturaActivity extends AppCompatActivity {
         // Lógica para iniciar la búsqueda
         Toast.makeText(this, "Abriendo búsqueda...", Toast.LENGTH_SHORT).show();
     }
+
 }
