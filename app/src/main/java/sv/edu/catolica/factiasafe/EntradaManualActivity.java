@@ -14,16 +14,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 public class EntradaManualActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private MaterialButton buttonCancelar;
-    private NestedScrollView nestedScrollView;
+    private ViewPager2 viewPager;
+    private final String[] tabTitles = new String[]{"Datos Principales", "Datos Extras"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,20 +40,30 @@ public class EntradaManualActivity extends AppCompatActivity {
         });
         toolbar = findViewById(R.id.toolbar);
         tabLayout = findViewById(R.id.tab_layout);
+        viewPager = findViewById(R.id.view_pager); // <- ViewPager2
         buttonCancelar = findViewById(R.id.button_cancelar);
-        nestedScrollView = findViewById(R.id.nestedScrollView);
 
         setSupportActionBar(toolbar);
-        // Habilitar el botón de retroceso (usa el ícono definido en el XML)
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
+        setupViewPager();
+
         setupListeners();
 
-        // Inicializar la vista: mostrar Datos Principales (índice 0)
-        showTabContent(0);
+    }
+
+    private void setupViewPager() {
+        EntradaPagerAdapter pagerAdapter = new EntradaPagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
+
+        // Sincroniza el TabLayout con el ViewPager2
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(tabTitles[position])
+        ).attach();
     }
 
     private void setupListeners() {
@@ -65,47 +78,6 @@ public class EntradaManualActivity extends AppCompatActivity {
                 // finish();
             }
         });
-
-        // Manejar el cambio de Pestañas (TabLayout)
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                showTabContent(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                // No es necesario hacer nada especial al deseleccionar
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                // Opcional: Desplazarse hacia arriba si se toca la pestaña actual
-                if (tab.getPosition() == 0) {
-                    nestedScrollView.smoothScrollTo(0, 0);
-                }
-            }
-        });
-
-        // Manejar el click en el campo de Fecha (para abrir un DatePickerDialog)
-        // TextInputEditText editFecha = findViewById(R.id.edit_fecha);
-        // editFecha.setOnClickListener(v -> showDatePickerDialog());
-    }
-
-    private void showTabContent(int position) {
-        if (position == 0) {
-            // Pestaña "Datos Principales"
-            nestedScrollView.setVisibility(View.VISIBLE);
-            // if (datosExtrasContainer != null) datosExtrasContainer.setVisibility(View.GONE);
-        } else if (position == 1) {
-            // Pestaña "Datos Extras"
-            nestedScrollView.setVisibility(View.GONE);
-            // Cuando crees la vista de Datos Extras:
-            // if (datosExtrasContainer != null) datosExtrasContainer.setVisibility(View.VISIBLE);
-
-            // Mensaje temporal, ya que la vista "Datos Extras" aún no existe
-            Toast.makeText(this, "Cargando vista de Datos Extras...", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
