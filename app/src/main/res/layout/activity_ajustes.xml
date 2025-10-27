@@ -179,6 +179,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:onClick="abrirPrivacidadSeguridad"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
                     android:paddingStart="16dp"

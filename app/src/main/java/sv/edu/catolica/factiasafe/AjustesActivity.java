@@ -37,4 +37,9 @@ public class AjustesActivity extends AppCompatActivity {
         Intent ventana = new Intent(AjustesActivity.this, PreferenciasPdfActivity.class);
         startActivity(ventana);
     }
+
+    public void abrirPrivacidadSeguridad(View view) {
+        Intent ventana = new Intent(AjustesActivity.this, PrivacidadSeguridadActivity.class);
+        startActivity(ventana);
+    }
 }
