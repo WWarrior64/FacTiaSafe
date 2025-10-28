@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FacTiaSafe">
         <activity
+            android:name=".OpcionEditarActivity"
+            android:exported="false" />
+        <activity
             android:name=".PrivacidadSeguridadActivity"
             android:exported="false" />
         <activity

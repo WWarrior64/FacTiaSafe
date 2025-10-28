@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:background="?attr/colorOnPrimary"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".OpcionEditarActivity">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorOnPrimary"
+        android:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/close_button"
+            android:layout_width="48dp"
+            android:onClick="CerrarEditar"
+            android:layout_height="48dp"
+            android:layout_gravity="start"
+            android:background="?attr/colorOnPrimary"
+            android:contentDescription="@string/cerrar"
+            android:src="@drawable/ic_close2"
+            app:tint="?attr/colorOnSecondary" />
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:text="@string/editar"
+            android:textSize="18sp"
+            android:textColor="?attr/colorOnSecondary"
+            android:textStyle="normal"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/done_button"
+            style="@style/Widget.MaterialComponents.Button"  android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="8dp"
+            android:text="@string/listo"
+            android:onClick="Listo"
+            app:cornerRadius="4dp" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
+
+
+    <FrameLayout
+        android:id="@+id/image_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toTopOf="@id/bottom_toolbar_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/imagen_factura"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/descrip_factura"
+            android:scaleType="fitCenter"
+            android:src="@drawable/factura_placeholder4"
+            tools:ignore="ImageContrastCheck" />
+
+    </FrameLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/colorOnPrimary"
+        app:layout_constraintBottom_toTopOf="@id/bottom_toolbar_container" />
+
+    <FrameLayout
+        android:id="@+id/bottom_toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorOnPrimary"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/main_options_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            tools:ignore="UselessParent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/crop_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Icon" android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/recortar"
+                android:textAllCaps="false"
+                android:textSize="13sp"
+                android:minHeight="64dp"
+                android:paddingHorizontal="4dp"
+                app:icon="@drawable/ic_recortar1"
+                app:iconGravity="top"
+                app:iconSize="24dp"
+                tools:ignore="VisualLintButtonSize" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/rotate_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Icon" android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/rotar"
+                android:textAllCaps="false"
+                android:textSize="13sp"
+                android:minHeight="64dp"
+                android:paddingHorizontal="4dp"
+                app:icon="@drawable/ic_rotar1"
+                app:iconGravity="top"
+                app:iconSize="24dp"
+                tools:ignore="VisualLintButtonSize" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/contrast_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Icon" android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/ajustar"
+                android:textAllCaps="false"
+                android:textSize="13sp"
+                android:minHeight="64dp"
+                android:paddingHorizontal="4dp"
+                app:icon="@drawable/ic_ajustar1"
+                app:iconGravity="top"
+                app:iconSize="24dp"
+                tools:ignore="VisualLintButtonSize" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/retake_button"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Icon" android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/retomar"
+                android:textAllCaps="false"
+                android:textSize="13sp"
+                android:minHeight="64dp"
+                android:paddingHorizontal="4dp"
+                app:icon="@drawable/ic_alternar1"
+                app:iconGravity="top"
+                app:iconSize="24dp"
+                tools:ignore="VisualLintButtonSize" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

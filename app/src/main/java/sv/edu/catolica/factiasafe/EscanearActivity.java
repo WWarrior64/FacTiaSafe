@@ -1,8 +1,10 @@
 package sv.edu.catolica.factiasafe;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +23,7 @@ public class EscanearActivity extends AppCompatActivity {
     private final int FRAGMENT_CONTAINER_ID = R.id.contenedor_fragment;
     private String fragmentTagActual = "IMAGEN_TAG";
     private View bottomBar;
+    private LinearLayout opcionEditar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,9 @@ public class EscanearActivity extends AppCompatActivity {
                     .add(FRAGMENT_CONTAINER_ID, imagenFragment, "IMAGEN_TAG")
                     .commit();
         }
+
+        opcionEditar = findViewById(R.id.opcion_editar);
+        opcionEditar.setOnClickListener(v -> abrirEditorImagen());
     }
 
     public void VolverFacturas(View view) {
@@ -93,5 +99,10 @@ public class EscanearActivity extends AppCompatActivity {
         android.util.TypedValue valorTipeado = new android.util.TypedValue();
         getTheme().resolveAttribute(atributo, valorTipeado, true);
         return valorTipeado.data;
+    }
+
+    private void abrirEditorImagen() {
+        Intent intent = new Intent(this, OpcionEditarActivity.class);
+        startActivity(intent);
     }
 }
