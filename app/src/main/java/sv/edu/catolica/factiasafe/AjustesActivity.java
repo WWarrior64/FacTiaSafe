@@ -42,4 +42,9 @@ public class AjustesActivity extends AppCompatActivity {
         Intent ventana = new Intent(AjustesActivity.this, PrivacidadSeguridadActivity.class);
         startActivity(ventana);
     }
+
+    public void abrirNotificaciones(View view) {
+        Intent ventana = new Intent(AjustesActivity.this, NotificacionesActivity.class);
+        startActivity(ventana);
+    }
 }
