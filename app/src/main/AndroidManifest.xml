@@ -12,8 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FacTiaSafe">
         <activity
+            android:name=".CategoriasActivity"
+            android:exported="false" />
+        <activity
             android:name=".NotificacionesActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".OpcionEditarActivity"
             android:exported="false" />

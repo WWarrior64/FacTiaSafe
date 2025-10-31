@@ -1,5 +1,6 @@
 package sv.edu.catolica.factiasafe;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -107,9 +108,6 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
         // 2. Listener para la opción de "Cambiar Ruta" (Clic en el ConstraintLayout completo)
         layoutCambiarRuta.setOnClickListener(v -> abrirSelectorRuta());
 
-        // 3. Listener para la opción de "Gestionar Categorías" (Clic en el ConstraintLayout completo)
-        layoutGestionarCategorias.setOnClickListener(v -> abrirGestionCategorias());
-
         // 4. Listeners para los Switch (Opcional, si quieres guardar cambios inmediatamente)
         /*
         switchProductos.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -131,10 +129,8 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
         // startActivity(intent);
     }
 
-    private void abrirGestionCategorias() {
-        // Aquí iría el Intent para abrir la actividad de gestión de categorías
-        Toast.makeText(this, "Abriendo gestión de categorías...", Toast.LENGTH_SHORT).show();
-        // Intent intent = new Intent(this, GestionCategoriasActivity.class);
-        // startActivity(intent);
+    public void abrirCategorias(View view) {
+        Intent ventana = new Intent(PreferenciasPdfActivity.this, CategoriasActivity.class);
+        startActivity(ventana);
     }
 }

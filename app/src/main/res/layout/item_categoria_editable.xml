@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="?attr/colorOnPrimary"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp">
+        <ImageView
+            android:id="@+id/icon_delete"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_remove_circle"
+            app:tint="?attr/colorError"
+            android:contentDescription="Eliminar categoría"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/text_categoria_nombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Servicios básicos"
+            android:textColor="?attr/colorOnSecondary"
+            android:textSize="16sp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/icon_delete"
+            app:layout_constraintEnd_toStartOf="@id/icon_drag_handle"/>
+
+        <ImageView
+            android:id="@+id/icon_drag_handle"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_drag_handle"
+            app:tint="?attr/colorOnSecondaryFixed"
+            android:contentDescription="Arrastrar para reordenar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:clickable="true"
+            android:focusable="true"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
