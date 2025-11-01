@@ -34,7 +34,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tienda o comercio"
+                    android:text="@string/tienda"
                     android:textColor="?attr/colorOnSecondary"
                     android:textSize="14sp"
                     android:textStyle="bold"/>
@@ -45,7 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:hint="p. ej. Sucursal Santa Ana"
+                    android:hint="@string/ej_sucursal"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -62,7 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Categoría"
+                    android:text="@string/categoria"
                     android:textColor="?attr/colorOnSecondary"
                     android:textSize="14sp"
                     android:textStyle="bold"/>
@@ -70,7 +70,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Selecciona una categoría para esta factura"
+                    android:text="@string/selecc_categoria"
                     android:textColor="?attr/colorOnSecondaryFixed"
                     android:textSize="12sp"
                     android:layout_marginBottom="4dp"/>
@@ -90,7 +90,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="none"
-                        android:text="Compras personales"
+                        android:text="@string/compras_personales"
                         android:textSize="14sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:text="Fotografía del artículo"
+            android:text="@string/fotografia_art"
             android:textColor="?attr/colorOnSecondary"
             android:textStyle="bold"
             android:textSize="16sp"
@@ -112,15 +112,18 @@
 
         <TextView
             android:id="@+id/label_foto_subtitulo"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="4dp"
-            android:text="Añade una fotografía del artículo o artículos adquiridos en esta factura"
+            android:layout_marginEnd="24dp"
+            android:text="@string/agrega_foto_art"
             android:textColor="?attr/colorOnSecondaryFixed"
             android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_foto_articulo" />
+            app:layout_constraintTop_toBottomOf="@id/label_foto_articulo"
+            tools:ignore="TextContrastCheck" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/photo_upload_area_articulo"
@@ -157,7 +160,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:contentDescription="Añadir foto"
+                        android:contentDescription="@string/agregar_foto"
                         android:src="@drawable/ic_image_import"
                         app:tint="?attr/colorPrimary" />
 
@@ -165,7 +168,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Toca para añadir"
+                        android:text="@string/area_agregar"
                         android:textColor="?attr/colorOnSecondaryFixed"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -178,7 +181,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
-            android:text="Notas Legales / Extras"
+            android:text="@string/notas_extras"
             android:textColor="?attr/colorOnSecondary"
             android:textStyle="bold"
             android:textSize="16sp"
@@ -212,7 +215,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:gravity="top"
-                    android:hint="Ej: Condiciones de garantía legal, cláusulas de devolución, notas del vendedor."
+                    android:hint="@string/clausulas"
                     android:inputType="textMultiLine"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>

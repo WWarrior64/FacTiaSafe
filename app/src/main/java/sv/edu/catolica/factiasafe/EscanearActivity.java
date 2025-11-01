@@ -23,7 +23,7 @@ public class EscanearActivity extends AppCompatActivity {
     private final int FRAGMENT_CONTAINER_ID = R.id.contenedor_fragment;
     private String fragmentTagActual = "IMAGEN_TAG";
     private View bottomBar;
-    private LinearLayout opcionEditar;
+    private LinearLayout opcionEditar, opcionDetalles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +51,10 @@ public class EscanearActivity extends AppCompatActivity {
         }
 
         opcionEditar = findViewById(R.id.opcion_editar);
+        opcionDetalles = findViewById(R.id.opcion_detalles);
         opcionEditar.setOnClickListener(v -> abrirEditorImagen());
+        opcionDetalles.setOnClickListener(v -> abrirDetalles());
+
     }
 
     public void VolverFacturas(View view) {
@@ -103,6 +106,11 @@ public class EscanearActivity extends AppCompatActivity {
 
     private void abrirEditorImagen() {
         Intent intent = new Intent(this, OpcionEditarActivity.class);
+        startActivity(intent);
+    }
+
+    private void abrirDetalles() {
+        Intent intent = new Intent(this, DetallesActivity.class);
         startActivity(intent);
     }
 }
