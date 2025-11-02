@@ -98,7 +98,6 @@
             tools:ignore="ButtonStyle,TouchTargetSizeCheck,VisualLintButtonSize,TextContrastCheck" />
     </LinearLayout>
 
-    <!-- Reemplaza el NestedScrollView existente con esto: -->
     <FrameLayout
         android:id="@+id/contenedor_fragment"
         android:layout_width="0dp"
@@ -109,26 +108,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/barra_navegacion_inferior">
 
-        <!-- El fragment de imagen por defecto -->
+        <!-- El fragment de imagen -->
         <FrameLayout
             android:id="@+id/fragment_imagen_container"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/selector_modo"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/barra_navegacion_inferior">
-        </FrameLayout>
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorOnPrimary"
+            android:gravity="center" />
 
-        <!-- FrameLayout para el fragment de texto -->
+        <!-- El fragment de texto -->
         <FrameLayout
             android:id="@+id/fragment_texto_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"/>
-
+            android:visibility="gone" />
     </FrameLayout>
+
 
     <include
         android:id="@+id/barra_navegacion_inferior"
