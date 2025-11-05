@@ -2,6 +2,10 @@ package sv.edu.catolica.factiasafe;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -9,7 +13,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -19,20 +22,23 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import com.google.android.material.chip.Chip;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class FacturaActivity extends BaseActivity {
-
     private RecyclerView recyclerView;
     private Chip selectedChip;
+    private List<Invoice> invoiceList = new ArrayList<>();
+    private InvoiceAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +50,13 @@ public class FacturaActivity extends BaseActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
         // Configuración de la Toolbar (métodos heredados)
         setToolbarTitle("Facturas");
         showUpButton(false);
 
         // Inicializa vistas del contenido (que ahora están en activity_factura_content.xml)
         ImageButton searchButton = toolbar.findViewById(R.id.search_button);
-
         if (searchButton != null) {
             searchButton.setOnClickListener(v -> handleSearchClick());
         }
@@ -63,6 +69,7 @@ public class FacturaActivity extends BaseActivity {
         // seleccionar A/Z por defecto
         Chip chipAz = findViewById(R.id.chip_az);
         if (chipAz != null) handleChipSelection(chipAz);
+        loadInvoices("A/Z"); // Carga inicial con filtro default
     }
 
     // >> CLAVE: Implementar el ID de navegación <<
@@ -76,7 +83,6 @@ public class FacturaActivity extends BaseActivity {
     // ------------------------------------
     // --- Manejo de Chips de Filtro (Nuevo) ---
     // ------------------------------------
-
     private void setupFilterChips() {
         Chip chipAz = findViewById(R.id.chip_az);
         Chip chipRecientes = findViewById(R.id.chip_recientes);
@@ -92,7 +98,7 @@ public class FacturaActivity extends BaseActivity {
     private void handleChipClick(Chip chip, String filterType) {
         handleChipSelection(chip);
         Toast.makeText(this, "Filtrando por: " + filterType, Toast.LENGTH_SHORT).show();
-        // Lógica para actualizar el RecyclerView (ej. adapter.applyFilter(filterType);)
+        loadInvoices(filterType); // Actualiza la lista con el filtro
     }
 
     private void handleChipSelection(Chip newSelectedChip) {
@@ -109,7 +115,6 @@ public class FacturaActivity extends BaseActivity {
         } catch (Exception e) {
             colorOnPrimary = fallbackOnPrimary;
         }
-
         int strokeColor;
         try {
             strokeColor = MaterialColors.getColor(newSelectedChip, com.google.android.material.R.attr.colorOnSecondary);
@@ -128,17 +133,64 @@ public class FacturaActivity extends BaseActivity {
         newSelectedChip.setChipBackgroundColor(ColorStateList.valueOf(colorPrimary));
         newSelectedChip.setChipStrokeWidth(0f);
         newSelectedChip.setTextColor(ContextCompat.getColor(this, R.color.white));
-
         selectedChip = newSelectedChip;
     }
 
     private void setupRecyclerView() {
-        // Implementa aquí la configuración de tu RecyclerView, LayoutManager y Adapter
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new InvoiceAdapter(this, invoiceList);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void loadInvoices(String filter) {
+        invoiceList.clear();
+
+        FaSafeDB dbHelper = new FaSafeDB(this);
+        SQLiteDatabase db = dbHelper.getReadableDatabase(); // Usa readable para consultas
+
+        String query = "SELECT id, company_name, date, total, currency, thumbnail_path FROM invoices";
+        String whereClause = "";
+        String orderBy = "";
+
+        if (filter.equals("A/Z")) {
+            orderBy = "company_name ASC";
+        } else if (filter.equals("Recientes")) {
+            orderBy = "date DESC";
+        } else if (filter.equals("Antiguos")) {
+            orderBy = "date ASC";
+        } else if (filter.equals("Este mes")) {
+            whereClause = " WHERE strftime('%Y-%m', date) = strftime('%Y-%m', 'now')";
+            orderBy = "date DESC"; // Default para este filtro
+        }
+
+        if (!whereClause.isEmpty()) {
+            query += whereClause;
+        }
+        if (!orderBy.isEmpty()) {
+            query += " ORDER BY " + orderBy;
+        }
+
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Invoice invoice = new Invoice();
+                invoice.setId(cursor.getInt(0));
+                invoice.setCompanyName(cursor.getString(1) != null ? cursor.getString(1) : "Sin nombre");
+                invoice.setDate(cursor.getString(2));
+                invoice.setTotal(cursor.getDouble(3));
+                invoice.setCurrency(cursor.getString(4) != null ? cursor.getString(4) : "$");
+                invoice.setThumbnailPath(cursor.getString(5));
+                invoiceList.add(invoice);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        adapter.notifyDataSetChanged();
     }
 
     private void handleSearchClick() {
-        // Lógica para iniciar la búsqueda
+        // Lógica para iniciar la búsqueda (puedes implementar SearchView o una actividad de búsqueda aquí)
         Toast.makeText(this, "Abriendo búsqueda...", Toast.LENGTH_SHORT).show();
     }
-
 }
