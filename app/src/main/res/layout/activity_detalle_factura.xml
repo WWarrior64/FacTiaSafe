@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorOnTertiary"
+    tools:context=".DetalleFacturaActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_encabezado"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/boton_volver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="16dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="?attr/colorOnSecondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,SpeakableTextPresentCheck"/>
+
+        <TextView
+            android:id="@+id/texto_titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detalles de Factura"
+            android:textSize="18sp"
+            android:textColor="?attr/colorOnSecondary"
+            android:textStyle="normal"
+            app:layout_constraintStart_toEndOf="@id/boton_volver"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="8dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/divisor_encabezado"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="?attr/colorOnPrimary"
+        app:layout_constraintTop_toBottomOf="@id/layout_encabezado"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/divisor_encabezado"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layout_botones_inferior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="100dp">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_datos_principales"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nombre_empresa"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/texto_nombre_empresa"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/fondo_campotexto3"
+                        android:padding="12dp"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSecondary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/num_factura"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/texto_numero_factura"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/fondo_campotexto3"
+                        android:padding="12dp"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSecondary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fecha_editarfactura"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:layout_marginBottom="4dp"/>
+
+                    <TextView
+                        android:id="@+id/texto_fecha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/fondo_campotexto3"
+                        android:padding="12dp"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSecondary" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/label_lista_items"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="Lista de Items"
+                android:textColor="?attr/colorOnSecondary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_datos_principales" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_lista_items"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/label_lista_items">
+
+                <TextView
+                    android:id="@+id/texto_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:layout_margin="8dp"
+                    android:gravity="top"
+                    android:padding="12dp"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSecondary"
+                    android:background="@drawable/fondo_campotexto3" />
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/label_totales"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="Totales"
+                android:textColor="?attr/colorOnSecondary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_lista_items" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_totales"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/label_totales">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:text="Subtotal"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/text_subtotal_value"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="start"
+                            android:text="$ 0.00"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Impuesto aplicado"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/texto_impuesto_aplicado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:background="@drawable/fondo_campotexto3"
+                        android:padding="12dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="Impuesto (%)"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/texto_porcentaje_impuesto"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="14sp"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:background="@drawable/fondo_campotexto3"
+                            android:padding="12dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="Impuesto ($)"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/texto_cantidad_impuesto"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="14sp"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:background="@drawable/fondo_campotexto3"
+                            android:padding="12dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="Descuento (%)"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/texto_porcentaje_descuento"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="14sp"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:background="@drawable/fondo_campotexto3"
+                            android:padding="12dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="Descuento ($)"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/texto_cantidad_descuento"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:textSize="14sp"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:background="@drawable/fondo_campotexto3"
+                            android:padding="12dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Total Final"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/text_total_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$ 0.00"
+                            android:textColor="?attr/colorOnSecondary"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/label_garantia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="Garantía"
+                android:textColor="?attr/colorOnSecondary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_totales" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_garantia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/label_garantia">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/garantia_editarfactura"
+                        android:textSize="16sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:layout_marginBottom="4dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false"
+                        android:layout_marginBottom="24dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/fecha_inicio_editarfactura"
+                                android:textSize="16sp"
+                                android:textColor="?attr/colorOnSecondary"
+                                android:layout_marginBottom="4dp"/>
+
+                            <TextView
+                                android:id="@+id/texto_fecha_inicio_garantia"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/fondo_campotexto3"
+                                android:padding="12dp"
+                                android:textSize="16sp"
+                                android:textColor="?attr/colorOnSecondary" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/fecha_fin_editarfactura"
+                                android:textSize="16sp"
+                                android:textColor="?attr/colorOnSecondary"
+                                android:layout_marginBottom="4dp"/>
+
+                            <TextView
+                                android:id="@+id/texto_fecha_fin_garantia"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/fondo_campotexto3"
+                                android:padding="12dp"
+                                android:textSize="16sp"
+                                android:textColor="?attr/colorOnSecondary" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Garantía (Meses)"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/texto_garantia"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:background="@drawable/fondo_campotexto3"
+                        android:padding="12dp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/label_datos_extras_principal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="Datos Extras"
+                android:textColor="?attr/colorOnSecondary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_garantia" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_datos_extras_principal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/label_datos_extras_principal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/tienda"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/texto_tienda_comercio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:background="@drawable/fondo_campotexto3"
+                        android:padding="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/categoria"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/texto_categoria"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSecondary"
+                        android:background="@drawable/fondo_campotexto3"
+                        android:padding="12dp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/label_foto_articulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/fotografia_art"
+                android:textColor="?attr/colorOnSecondary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_datos_extras_principal" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_imagen_factura"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="0dp"
+                app:layout_constraintTop_toBottomOf="@id/label_foto_articulo">
+
+                <ImageView
+                    android:id="@+id/imagen_factura"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:maxHeight="390dp"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    tools:ignore="ContentDescription,ImageContrastCheck" />
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/label_datos_extras_titulo_notas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/notas_extras"
+                android:textColor="?attr/colorOnSecondary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_imagen_factura" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_datos_extras"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="?attr/colorOnPrimary"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/label_datos_extras_titulo_notas">
+
+                <TextView
+                    android:id="@+id/texto_datos_extras"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_margin="8dp"
+                    android:gravity="top"
+                    android:padding="12dp"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSecondary"
+                    android:background="@drawable/fondo_campotexto3" />
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/layout_botones_inferior"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="?attr/colorOnPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/action_editar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/boton_redondeado3"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_horizontal"
+            android:minWidth="48dp"
+            android:orientation="vertical"
+            android:padding="8dp"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_edit"
+                app:tint="?attr/colorOnPrimary"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Editar"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/action_borrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:background="@drawable/boton_redondeado3"
+            android:layout_marginEnd="16dp"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_delete"
+                app:tint="?attr/colorOnPrimary"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Borrar"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="12sp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/action_cancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginStart="16dp"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_close"
+                app:tint="?attr/colorOnSecondary"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancelar_3"
+                android:textColor="?attr/colorOnSecondary"
+                android:textSize="12sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

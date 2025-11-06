@@ -34,7 +34,6 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
     @Override
     public void onBindViewHolder(@NonNull InvoiceViewHolder holder, int position) {
         Invoice invoice = invoiceList.get(position);
-
         holder.title.setText(invoice.getCompanyName());
 
         // Formatear info: fecha - moneda total
@@ -90,8 +89,8 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
                 if (position != RecyclerView.NO_POSITION) {
                     Invoice invoice = invoiceList.get(position);
                     Context context = itemView.getContext();
-                    Intent intent = new Intent(context, EditarFacturaActivity.class);
-                    intent.putExtra("INVOICE_ID", invoice.getId());
+                    Intent intent = new Intent(context, DetalleFacturaActivity.class);
+                    intent.putExtra("invoice_id", invoice.getId());
                     context.startActivity(intent);
                 }
             });

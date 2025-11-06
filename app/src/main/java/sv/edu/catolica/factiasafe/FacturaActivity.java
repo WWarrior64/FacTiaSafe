@@ -4,20 +4,15 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -25,11 +20,8 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.color.MaterialColors;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,8 +70,6 @@ public class FacturaActivity extends BaseActivity {
         return R.id.navigation_facturas;
     }
 
-    // >> CLAVE: Implementar el comportamiento del FAB heredado <<
-
     // ------------------------------------
     // --- Manejo de Chips de Filtro (Nuevo) ---
     // ------------------------------------
@@ -108,6 +98,7 @@ public class FacturaActivity extends BaseActivity {
 
         // Resuelve colores desde el tema usando MaterialColors (usa el chip como view)
         int colorPrimary = MaterialColors.getColor(newSelectedChip, androidx.appcompat.R.attr.colorPrimary);
+
         // intenta resolver colorOnPrimary, si no existe usa fallback
         int colorOnPrimary;
         try {
@@ -115,6 +106,7 @@ public class FacturaActivity extends BaseActivity {
         } catch (Exception e) {
             colorOnPrimary = fallbackOnPrimary;
         }
+
         int strokeColor;
         try {
             strokeColor = MaterialColors.getColor(newSelectedChip, com.google.android.material.R.attr.colorOnSecondary);
@@ -144,7 +136,6 @@ public class FacturaActivity extends BaseActivity {
 
     private void loadInvoices(String filter) {
         invoiceList.clear();
-
         FaSafeDB dbHelper = new FaSafeDB(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase(); // Usa readable para consultas
 
@@ -185,7 +176,6 @@ public class FacturaActivity extends BaseActivity {
         }
         cursor.close();
         db.close();
-
         adapter.notifyDataSetChanged();
     }
 
