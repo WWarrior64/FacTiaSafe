@@ -6,8 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -23,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.tabs.TabLayout;
 
@@ -49,6 +52,7 @@ public class DatosPrincipalesFragment extends Fragment {
     private TextInputLayout inputGarantiaStart, inputGarantiaEnd;
     private EditText editGarantiaStart, editGarantiaEnd;
     private TextView textSubtotalValue, textTotalValue;
+    private SwitchMaterial switchImpuesto;
     private TabLayout tabLayout;
     private ImageView imageThumbnail;
     private View photoUploadArea;
@@ -66,6 +70,7 @@ public class DatosPrincipalesFragment extends Fragment {
     private String thumbnailPath = "";
     private String warrantyStart = "";
     private String warrantyEnd = "";
+    private int taxApplied = 0;
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
@@ -138,17 +143,33 @@ public class DatosPrincipalesFragment extends Fragment {
         editGarantiaStart = view.findViewById(R.id.edit_garantia_start);
         editGarantiaEnd = view.findViewById(R.id.edit_garantia_end);
 
+        switchImpuesto = view.findViewById(R.id.switch_impuesto);
+
         tabLayout = requireActivity().findViewById(R.id.tab_layout);
 
         // Photo area and thumbnail
         photoUploadArea = view.findViewById(R.id.photo_upload_area);
         imageThumbnail = view.findViewById(R.id.image_thumbnail);
 
-        setupListeners();
+        // Hacer cantidad_impuesto y cantidad_descuento read-only si existen
+        if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null) {
+            inputCantidadImpuesto.getEditText().setEnabled(false);
+            inputCantidadImpuesto.getEditText().setFocusable(false);
+        }
+        if (inputCantidadDescuento != null && inputCantidadDescuento.getEditText() != null) {
+            inputCantidadDescuento.getEditText().setEnabled(false);
+            inputCantidadDescuento.getEditText().setFocusable(false);
+        }
+
+        // Primero cargar datos (para que cuando añadamos listeners no se dispare lógica con campos vacíos)
         loadData();
+
+        // Luego listeners
+        setupListeners();
     }
 
     private void setupListeners() {
+
         // Fecha emisión click -> DatePicker
         if (inputFecha != null && inputFecha.getEditText() != null) {
             inputFecha.getEditText().setOnClickListener(v -> showDatePicker((EditText) inputFecha.getEditText()));
@@ -158,18 +179,80 @@ public class DatosPrincipalesFragment extends Fragment {
         // Garantía start/end click -> DatePicker
         if (editGarantiaStart != null) {
             editGarantiaStart.setOnClickListener(v -> showDatePicker(editGarantiaStart));
-            inputGarantiaStart.setEndIconOnClickListener(v -> showDatePicker(editGarantiaStart));
+            if (inputGarantiaStart != null) inputGarantiaStart.setEndIconOnClickListener(v -> showDatePicker(editGarantiaStart));
         }
         if (editGarantiaEnd != null) {
             editGarantiaEnd.setOnClickListener(v -> showDatePicker(editGarantiaEnd));
-            inputGarantiaEnd.setEndIconOnClickListener(v -> showDatePicker(editGarantiaEnd));
+            if (inputGarantiaEnd != null) inputGarantiaEnd.setEndIconOnClickListener(v -> showDatePicker(editGarantiaEnd));
         }
 
         // Photo upload click -> open document chooser
         if (photoUploadArea != null) {
-            photoUploadArea.setOnClickListener(v -> {
-                // Lanzar selector de imágenes: tipos permitidos
-                pickImageLauncher.launch(new String[]{"image/*"});
+            photoUploadArea.setOnClickListener(v -> pickImageLauncher.launch(new String[]{"image/*"}));
+        }
+
+        // Switch (protegido contra NPE)
+        if (switchImpuesto != null) {
+            switchImpuesto.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                try {
+                    taxApplied = isChecked ? 1 : 0;
+                    updateTaxFieldsState();
+                    calculateTotal();
+                } catch (Exception e) {
+                    Log.e(TAG, "switchImpuesto listener error", e);
+                }
+            });
+        }
+
+        // TextWatcher para items (sólo si existe EditText)
+        if (inputItems != null && inputItems.getEditText() != null) {
+            inputItems.getEditText().addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try {
+                        calculateSubtotalFromItems();
+                    } catch (Exception e) {
+                        Log.e(TAG, "calculateSubtotalFromItems error", e);
+                    }
+                }
+            });
+        }
+
+        // Porcentaje impuesto watcher (sólo si campo existe)
+        if (inputPorcentajeImpuesto != null && inputPorcentajeImpuesto.getEditText() != null) {
+            inputPorcentajeImpuesto.getEditText().addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try {
+                        taxPercentage = safeParse(s != null ? s.toString() : "");
+                        if (taxApplied == 1) {
+                            taxAmount = round2(subtotal * taxPercentage / 100.0);
+                            if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
+                                inputCantidadImpuesto.getEditText().setText(String.format(Locale.getDefault(), "%.2f", taxAmount));
+                        }
+                        calculateTotal();
+                    } catch (Exception e) {
+                        Log.e(TAG, "tax % watcher error", e);
+                    }
+                }
+            });
+        }
+
+        // Porcentaje descuento watcher
+        if (inputPorcentajeDescuento != null && inputPorcentajeDescuento.getEditText() != null) {
+            inputPorcentajeDescuento.getEditText().addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try {
+                        discountPercentage = safeParse(s != null ? s.toString() : "");
+                        discountAmount = round2(subtotal * discountPercentage / 100.0);
+                        if (inputCantidadDescuento != null && inputCantidadDescuento.getEditText() != null)
+                            inputCantidadDescuento.getEditText().setText(String.format(Locale.getDefault(), "%.2f", discountAmount));
+                        calculateTotal();
+                    } catch (Exception e) {
+                        Log.e(TAG, "discount % watcher error", e);
+                    }
+                }
             });
         }
 
@@ -185,9 +268,31 @@ public class DatosPrincipalesFragment extends Fragment {
         }
     }
 
+    private void updateTaxFieldsState() {
+        try {
+            if (inputPorcentajeImpuesto != null) inputPorcentajeImpuesto.setEnabled(taxApplied == 1);
+            if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
+                inputCantidadImpuesto.getEditText().setEnabled(false); // always read-only
+            if (taxApplied == 1) {
+                if (inputPorcentajeImpuesto != null && inputPorcentajeImpuesto.getEditText() != null)
+                    inputPorcentajeImpuesto.getEditText().setText(String.valueOf(taxPercentage > 0.0 ? taxPercentage : ""));
+                if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
+                    inputCantidadImpuesto.getEditText().setText(taxAmount > 0.0 ? String.format(Locale.getDefault(), "%.2f", taxAmount) : "");
+            } else {
+                taxPercentage = 0.0;
+                taxAmount = 0.0;
+                if (inputPorcentajeImpuesto != null && inputPorcentajeImpuesto.getEditText() != null)
+                    inputPorcentajeImpuesto.getEditText().setText("");
+                if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
+                    inputCantidadImpuesto.getEditText().setText("");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "updateTaxFieldsState error", e);
+        }
+    }
+
     private void showDatePicker(final EditText target) {
         final Calendar cal = Calendar.getInstance();
-        // si ya tiene texto en formato yyyy-MM-dd, usarlo como valor inicial
         String current = target.getText() != null ? target.getText().toString() : "";
         if (!TextUtils.isEmpty(current)) {
             try {
@@ -205,6 +310,84 @@ public class DatosPrincipalesFragment extends Fragment {
             target.setText(sdf.format(sel.getTime()));
         }, year, month, day);
         dpd.show();
+    }
+
+    private void calculateSubtotalFromItems() {
+        subtotal = 0.0;
+        if (inputItems == null || inputItems.getEditText() == null) {
+            updateSubtotalUI();
+            return;
+        }
+        String itemsText = inputItems.getEditText().getText() != null ? inputItems.getEditText().getText().toString() : "";
+        if (TextUtils.isEmpty(itemsText)) {
+            subtotal = 0.0;
+            updateSubtotalUI();
+            // recalc amounts
+            if (taxApplied == 1) taxAmount = round2(subtotal * taxPercentage / 100.0);
+            discountAmount = round2(subtotal * discountPercentage / 100.0);
+            updateAmountsUI();
+            calculateTotal();
+            return;
+        }
+
+        String[] lines = itemsText.split("\\r?\\n");
+        for (String line : lines) {
+            if (TextUtils.isEmpty(line.trim())) continue;
+            String[] parts = line.split("\\s*;\\s*"); // consistente con guardado
+            if (parts.length >= 3) {
+                double qty = safeParse(parts[1]);
+                double price = safeParse(parts[2]);
+                subtotal += qty * price;
+            }
+        }
+        subtotal = round2(subtotal);
+        updateSubtotalUI();
+
+        // recalcular impuesto y descuento
+        if (taxApplied == 1) {
+            taxAmount = round2(subtotal * taxPercentage / 100.0);
+        } else {
+            taxAmount = 0.0;
+        }
+        discountAmount = round2(subtotal * discountPercentage / 100.0);
+
+        updateAmountsUI();
+        calculateTotal();
+    }
+
+    private void updateSubtotalUI() {
+        if (textSubtotalValue == null) return;
+        final String display = !TextUtils.isEmpty(currency) ? currency + " " + String.format(Locale.getDefault(), "%.2f", subtotal)
+                : String.format(Locale.getDefault(), "%.2f", subtotal);
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                try { textSubtotalValue.setText(display); } catch (Exception ignored) {}
+            });
+        } else {
+            try { textSubtotalValue.setText(display); } catch (Exception ignored) {}
+        }
+    }
+
+    private void updateAmountsUI() {
+        if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
+            inputCantidadImpuesto.getEditText().setText(taxAmount > 0.0 ? String.format(Locale.getDefault(), "%.2f", taxAmount) : "");
+        if (inputCantidadDescuento != null && inputCantidadDescuento.getEditText() != null)
+            inputCantidadDescuento.getEditText().setText(discountAmount > 0.0 ? String.format(Locale.getDefault(), "%.2f", discountAmount) : "");
+    }
+
+    private void calculateTotal() {
+        total = round2(subtotal + taxAmount - discountAmount);
+        if (total < 0.0) total = 0.0;
+        if (textTotalValue == null) return;
+        final String display = !TextUtils.isEmpty(currency) ? currency + " " + String.format(Locale.getDefault(), "%.2f", total)
+                : String.format(Locale.getDefault(), "%.2f", total);
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                try { textTotalValue.setText(display); } catch (Exception ignored) {}
+            });
+        } else {
+            try { textTotalValue.setText(display); } catch (Exception ignored) {}
+        }
     }
 
     private void loadData() {
@@ -226,6 +409,7 @@ public class DatosPrincipalesFragment extends Fragment {
             String date = safeGetString(c, "date");
 
             subtotal = safeGetDouble(c, "subtotal");
+            taxApplied = c.getColumnIndex("tax_applied") != -1 ? c.getInt(c.getColumnIndexOrThrow("tax_applied")) : 0;
             taxPercentage = safeGetDouble(c, "tax_percentage");
             taxAmount = safeGetDouble(c, "tax_amount");
             discountPercentage = safeGetDouble(c, "discount_percentage");
@@ -234,6 +418,10 @@ public class DatosPrincipalesFragment extends Fragment {
             currency = safeGetString(c, "currency");
             String notes = safeGetString(c, "notes");
             thumbnailPath = safeGetString(c, "thumbnail_path");
+
+            // marcar switch pero no ejecutar listener durante setChecked (listener ya no registrado)
+            if (switchImpuesto != null) switchImpuesto.setChecked(taxApplied == 1);
+            updateTaxFieldsState();
 
             if (inputEmpresa != null && inputEmpresa.getEditText() != null)
                 inputEmpresa.getEditText().setText(companyName);
@@ -246,19 +434,19 @@ public class DatosPrincipalesFragment extends Fragment {
             if (textTotalValue != null) textTotalValue.setText(!TextUtils.isEmpty(currency) ? currency + " " + String.format("%.2f", total) : String.format("%.2f", total));
 
             if (inputPorcentajeImpuesto != null && inputPorcentajeImpuesto.getEditText() != null)
-                inputPorcentajeImpuesto.getEditText().setText(String.valueOf(taxPercentage));
+                inputPorcentajeImpuesto.getEditText().setText(taxPercentage > 0.0 ? String.valueOf(taxPercentage) : "");
             if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
-                inputCantidadImpuesto.getEditText().setText(!TextUtils.isEmpty(currency) ? currency + " " + String.format("%.2f", taxAmount) : String.valueOf(taxAmount));
+                inputCantidadImpuesto.getEditText().setText(taxAmount > 0.0 ? String.format(Locale.getDefault(), "%.2f", taxAmount) : "");
 
             if (inputPorcentajeDescuento != null && inputPorcentajeDescuento.getEditText() != null)
-                inputPorcentajeDescuento.getEditText().setText(String.valueOf(discountPercentage));
+                inputPorcentajeDescuento.getEditText().setText(discountPercentage > 0.0 ? String.valueOf(discountPercentage) : "");
             if (inputCantidadDescuento != null && inputCantidadDescuento.getEditText() != null)
-                inputCantidadDescuento.getEditText().setText(!TextUtils.isEmpty(currency) ? currency + " " + String.format("%.2f", discountAmount) : String.valueOf(discountAmount));
+                inputCantidadDescuento.getEditText().setText(discountAmount > 0.0 ? String.format(Locale.getDefault(), "%.2f", discountAmount) : "");
 
             if (inputItems != null && inputItems.getEditText() != null)
                 inputItems.getEditText().setText(loadItemsText(db));
 
-            // Warranty table
+            // tabla de garantia
             Cursor w = db.rawQuery("SELECT warranty_start, warranty_end FROM warranties WHERE invoice_id = ?", new String[]{String.valueOf(invoiceId)});
             if (w.moveToFirst()) {
                 warrantyStart = w.isNull(0) ? "" : w.getString(0);
@@ -273,8 +461,11 @@ public class DatosPrincipalesFragment extends Fragment {
                 loadThumbnailIntoView(thumbnailPath);
             }
 
+            // recalcular desde items por si hay inconsistencia
+            calculateSubtotalFromItems();
+
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "loadData error", e);
         } finally {
             c.close();
             db.close();
@@ -295,9 +486,6 @@ public class DatosPrincipalesFragment extends Fragment {
         }
     }
 
-    /**
-     * Copia el contenido de la Uri seleccionada en almacenamiento interno de la app y devuelve la ruta guardada
-     */
     private String copyUriToInternalStorage(Uri uri) {
         if (uri == null) return "";
         try {
@@ -365,26 +553,26 @@ public class DatosPrincipalesFragment extends Fragment {
             double qty = 0.0;
             double unit = 0.0;
             if (parts.length > 1) {
-                try { qty = Double.parseDouble(parts[1]); } catch (Exception ignored) {}
+                qty = safeParse(parts[1]);
             }
             if (parts.length > 2) {
-                try { unit = Double.parseDouble(parts[2]); } catch (Exception ignored) {}
+                unit = safeParse(parts[2]);
             }
 
-            // Insert
-            db.execSQL("INSERT INTO invoice_items (invoice_id, description, quantity, unit_price) VALUES (?, ?, ?, ?)",
-                    new Object[]{invoiceId, desc, qty, unit});
+            double lineTotal = round2(qty * unit);
 
-            // acumular subtotal
-            subtotalLocal += qty * unit;
+            // Insert incluyendo line_total (tu tabla sí la tiene)
+            db.execSQL(
+                    "INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, line_total) VALUES (?, ?, ?, ?, ?)",
+                    new Object[]{invoiceId, desc, qty, unit, lineTotal}
+            );
+
+            subtotalLocal += lineTotal;
         }
 
         return subtotalLocal;
     }
 
-    /**
-     * Guarda thumbnail_path en la tabla invoices
-     */
     private void saveThumbnailPathToDb(SQLiteDatabase db) {
         if (invoiceId == -1 || TextUtils.isEmpty(thumbnailPath) || db == null) return;
         db.execSQL("UPDATE invoices SET thumbnail_path = ? WHERE id = ?", new Object[]{thumbnailPath, invoiceId});
@@ -392,43 +580,10 @@ public class DatosPrincipalesFragment extends Fragment {
 
     /**
      * Método público para persistir desde el fragment: items + thumbnail + warranty (si deseas).
-     * La Activity puede llamarlo en su flujo de guardar. Si la Activity ya maneja la transacción
-     * puedes abrir y pasar su SQLiteDatabase para evitar transacciones anidadas; aquí abrimos/cierramos por separado.
+     * La Activity puede llamarlo en su flujo de guardar. Aquí se abre/ cierra transacción.
      */
-    public void persistChanges() {
-        FaSafeDB dbHelper = new FaSafeDB(requireContext());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.beginTransaction();
-        try {
-            // items
-            saveItemsToDb(db);
 
-            // thumbnail
-            if (!TextUtils.isEmpty(thumbnailPath)) {
-                saveThumbnailPathToDb(db);
-            }
-
-            // warranty
-            String start = editGarantiaStart != null ? editGarantiaStart.getText().toString() : "";
-            String end = editGarantiaEnd != null ? editGarantiaEnd.getText().toString() : "";
-            Cursor checkWarranty = db.rawQuery("SELECT id FROM warranties WHERE invoice_id = ?", new String[]{String.valueOf(invoiceId)});
-            if (checkWarranty.moveToFirst()) {
-                db.execSQL("UPDATE warranties SET warranty_start = ?, warranty_end = ? WHERE invoice_id = ?", new Object[]{start, end, invoiceId});
-            } else if (!TextUtils.isEmpty(start) && !TextUtils.isEmpty(end)) {
-                db.execSQL("INSERT INTO warranties (invoice_id, warranty_start, warranty_end) VALUES (?, ?, ?)", new Object[]{invoiceId, start, end});
-            }
-            checkWarranty.close();
-
-            db.setTransactionSuccessful();
-        } catch (Exception e) {
-            Log.e(TAG, "persistChanges error: " + e.getMessage(), e);
-        } finally {
-            db.endTransaction();
-            db.close();
-        }
-    }
-
-    // ----- getters públicos para que la Activity los use al guardar (los tienes ya) -----
+    // ----- getters públicos -----
     public String getCompanyName() {
         return inputEmpresa != null && inputEmpresa.getEditText() != null ? inputEmpresa.getEditText().getText().toString() : "";
     }
@@ -439,30 +594,10 @@ public class DatosPrincipalesFragment extends Fragment {
         return inputFecha != null && inputFecha.getEditText() != null ? inputFecha.getEditText().getText().toString() : "";
     }
     public double getSubtotal() { return subtotal; }
-    public double getTaxPercentage() {
-        try { return inputPorcentajeImpuesto != null && inputPorcentajeImpuesto.getEditText() != null ?
-                Double.parseDouble(inputPorcentajeImpuesto.getEditText().getText().toString()) : taxPercentage;
-        } catch (Exception e) { return taxPercentage; }
-    }
-    public double getTaxAmount() {
-        try {
-            String s = inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null ? inputCantidadImpuesto.getEditText().getText().toString() : String.valueOf(taxAmount);
-            s = s.replace(currency, "").replace("$", "").trim();
-            return Double.parseDouble(s);
-        } catch (Exception e) { return taxAmount; }
-    }
-    public double getDiscountPercentage() {
-        try { return inputPorcentajeDescuento != null && inputPorcentajeDescuento.getEditText() != null ?
-                Double.parseDouble(inputPorcentajeDescuento.getEditText().getText().toString()) : discountPercentage;
-        } catch (Exception e) { return discountPercentage; }
-    }
-    public double getDiscountAmount() {
-        try {
-            String s = inputCantidadDescuento != null && inputCantidadDescuento.getEditText() != null ? inputCantidadDescuento.getEditText().getText().toString() : String.valueOf(discountAmount);
-            s = s.replace(currency, "").replace("$", "").trim();
-            return Double.parseDouble(s);
-        } catch (Exception e) { return discountAmount; }
-    }
+    public double getTaxPercentage() { return taxPercentage; }
+    public double getTaxAmount() { return taxAmount; }
+    public double getDiscountPercentage() { return discountPercentage; }
+    public double getDiscountAmount() { return discountAmount; }
     public double getTotal() { return total; }
     public String getCurrency() { return currency; }
     public String getThumbnailPath() { return thumbnailPath; }
@@ -482,72 +617,81 @@ public class DatosPrincipalesFragment extends Fragment {
         return c.isNull(idx) ? 0.0 : c.getDouble(idx);
     }
 
-    // helpers: parsear double de un TextInputLayout y formatear
-    private double parseDoubleFromTextInputLayout(TextInputLayout til) {
-        if (til == null || til.getEditText() == null) return 0.0;
-        String s = til.getEditText().getText().toString();
+    private double safeParse(String s) {
         if (TextUtils.isEmpty(s)) return 0.0;
-        // eliminar moneda y símbolos
-        s = s.replace(currency, "").replace("$", "").replace(",", "").trim();
         try {
+            s = s.replace(currency, "").replace("$", "").replace(",", "").trim();
             return Double.parseDouble(s);
         } catch (Exception e) {
             return 0.0;
         }
     }
 
-    private String formatMoney(double value) {
-        return String.format(Locale.getDefault(), "%s %.2f", TextUtils.isEmpty(currency) ? "" : currency, value).trim();
-    }
-
     private double round2(double v) {
         return Math.round(v * 100.0) / 100.0;
     }
 
-
     /**
      * Guarda items, thumbnail_path y warranty usando la SQLiteDatabase proporcionada.
-     * Además actualiza la columna invoices.subtotal con el subtotal calculado
-     * (no recalcula impuestos/total aquí — si quieres, se pueden añadir).
-     * No inicia/termina transacción: el llamador (Activity) debe hacerlo.
+     * NO inicia ni termina transacción (la Activity debe hacerlo).
      */
     public void saveIntoDatabase(SQLiteDatabase db) throws Exception {
         if (invoiceId == -1 || db == null) return;
 
         // 1) Guardar items y obtener subtotal
-        double newSubtotal = saveItemsToDb(db);
+        double newSubtotal = saveItemsToDb(db); // tu método existente
         newSubtotal = round2(newSubtotal);
 
-        // 2) Guardar thumbnail_path (si existe)
+        // 2) Guardar thumbnail_path si existe
         if (!TextUtils.isEmpty(thumbnailPath)) {
-            db.execSQL("UPDATE invoices SET thumbnail_path = ? WHERE id = ?", new Object[]{thumbnailPath, invoiceId});
+            saveThumbnailPathToDb(db); // tu método existente
         }
 
-        // 3) Guardar warranty (mantengo tu lógica)
+        // 3) Guardar/actualizar warranty
         String start = editGarantiaStart != null ? editGarantiaStart.getText().toString() : "";
         String end = editGarantiaEnd != null ? editGarantiaEnd.getText().toString() : "";
         Cursor checkWarranty = db.rawQuery("SELECT id FROM warranties WHERE invoice_id = ?", new String[]{String.valueOf(invoiceId)});
         if (checkWarranty.moveToFirst()) {
-            db.execSQL("UPDATE warranties SET warranty_start = ?, warranty_end = ? WHERE invoice_id = ?", new Object[]{start, end, invoiceId});
+            db.execSQL("UPDATE warranties SET warranty_start = ?, warranty_end = ? WHERE invoice_id = ?",
+                    new Object[]{start, end, invoiceId});
         } else if (!TextUtils.isEmpty(start) && !TextUtils.isEmpty(end)) {
             db.execSQL("INSERT INTO warranties (invoice_id, warranty_start, warranty_end) VALUES (?, ?, ?)",
                     new Object[]{invoiceId, start, end});
         }
         checkWarranty.close();
 
-        // 4) Leer porcentajes / montos (UI)
-        double taxPctInput = parseDoubleFromTextInputLayout(inputPorcentajeImpuesto);     // % preferencia
-        double taxAmtInput = parseDoubleFromTextInputLayout(inputCantidadImpuesto);       // $ alternativa
+        // 4) Leer porcentajes / montos desde UI (uso safeParse para evitar NPE/format errors)
+        double taxPctInput = 0.0;
+        double taxAmtInput = 0.0;
+        double discPctInput = 0.0;
+        double discAmtInput = 0.0;
 
-        double discPctInput = parseDoubleFromTextInputLayout(inputPorcentajeDescuento);
-        double discAmtInput = parseDoubleFromTextInputLayout(inputCantidadDescuento);
+        if (inputPorcentajeImpuesto != null && inputPorcentajeImpuesto.getEditText() != null)
+            taxPctInput = safeParse(inputPorcentajeImpuesto.getEditText().getText().toString());
+
+        if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
+            taxAmtInput = safeParse(inputCantidadImpuesto.getEditText().getText().toString());
+
+        if (inputPorcentajeDescuento != null && inputPorcentajeDescuento.getEditText() != null)
+            discPctInput = safeParse(inputPorcentajeDescuento.getEditText().getText().toString());
+        else {
+            discPctInput = 0.0;
+        }
+
+        if (inputCantidadDescuento != null && inputCantidadDescuento.getEditText() != null)
+            discAmtInput = safeParse(inputCantidadDescuento.getEditText().getText().toString());
 
         // 5) Determinar valores finales: prioridad a porcentaje si > 0, si no usar monto explícito
         double taxAmountCalculated = 0.0;
-        if (taxPctInput > 0.0) {
-            taxAmountCalculated = round2(newSubtotal * taxPctInput / 100.0);
+        if (taxApplied == 1) {
+            if (taxPctInput > 0.0) {
+                taxAmountCalculated = round2(newSubtotal * taxPctInput / 100.0);
+            } else {
+                taxAmountCalculated = round2(taxAmtInput);
+            }
         } else {
-            taxAmountCalculated = round2(taxAmtInput);
+            taxPctInput = 0.0;
+            taxAmountCalculated = 0.0;
         }
 
         double discountAmountCalculated = 0.0;
@@ -562,8 +706,8 @@ public class DatosPrincipalesFragment extends Fragment {
         if (newTotal < 0.0) newTotal = 0.0;
 
         // 7) Actualizar la fila invoices con todos los campos calculados
-        db.execSQL("UPDATE invoices SET subtotal = ?, tax_percentage = ?, tax_amount = ?, discount_percentage = ?, discount_amount = ?, total = ? WHERE id = ?",
-                new Object[]{newSubtotal, taxPctInput, taxAmountCalculated, discPctInput, discountAmountCalculated, newTotal, invoiceId});
+        db.execSQL("UPDATE invoices SET subtotal = ?, tax_applied = ?, tax_percentage = ?, tax_amount = ?, discount_percentage = ?, discount_amount = ?, total = ? WHERE id = ?",
+                new Object[]{newSubtotal, taxApplied, taxPctInput, taxAmountCalculated, discPctInput, discountAmountCalculated, newTotal, invoiceId});
 
         // 8) Actualizar campos locales y UI
         subtotal = newSubtotal;
@@ -573,32 +717,32 @@ public class DatosPrincipalesFragment extends Fragment {
         discountAmount = discountAmountCalculated;
         total = newTotal;
 
-        // Actualizar UI en hilo principal
         final String subtotalDisplay = !TextUtils.isEmpty(currency) ? String.format(Locale.getDefault(), "%s %.2f", currency, subtotal) : String.format(Locale.getDefault(), "%.2f", subtotal);
         final String totalDisplay = !TextUtils.isEmpty(currency) ? String.format(Locale.getDefault(), "%s %.2f", currency, total) : String.format(Locale.getDefault(), "%.2f", total);
 
         if (getActivity() != null) {
             double finalTaxAmountCalculated = taxAmountCalculated;
             double finalDiscountAmountCalculated = discountAmountCalculated;
+            double finalTaxPctInput = taxPctInput;
+            double finalDiscPctInput = discPctInput;
             getActivity().runOnUiThread(() -> {
                 try {
                     if (textSubtotalValue != null) textSubtotalValue.setText(subtotalDisplay);
                     if (textTotalValue != null) textTotalValue.setText(totalDisplay);
 
-                    // mostrar porcentajes/montos en los campos correspondientes
+                    // Mostrar porcentajes/montos en los campos correspondientes (vaciar si 0)
                     if (inputPorcentajeImpuesto != null && inputPorcentajeImpuesto.getEditText() != null)
-                        inputPorcentajeImpuesto.getEditText().setText(String.valueOf(taxPctInput > 0.0 ? taxPctInput : ""));
+                        inputPorcentajeImpuesto.getEditText().setText(finalTaxPctInput > 0.0 ? String.valueOf(finalTaxPctInput) : "");
 
                     if (inputCantidadImpuesto != null && inputCantidadImpuesto.getEditText() != null)
-                        inputCantidadImpuesto.getEditText().setText(finalTaxAmountCalculated > 0.0 ? formatMoney(finalTaxAmountCalculated) : "");
+                        inputCantidadImpuesto.getEditText().setText(finalTaxAmountCalculated > 0.0 ? String.format(Locale.getDefault(), "%.2f", finalTaxAmountCalculated) : "");
 
                     if (inputPorcentajeDescuento != null && inputPorcentajeDescuento.getEditText() != null)
-                        inputPorcentajeDescuento.getEditText().setText(String.valueOf(discPctInput > 0.0 ? discPctInput : ""));
+                        inputPorcentajeDescuento.getEditText().setText(finalDiscPctInput > 0.0 ? String.valueOf(finalDiscPctInput) : "");
 
                     if (inputCantidadDescuento != null && inputCantidadDescuento.getEditText() != null)
-                        inputCantidadDescuento.getEditText().setText(finalDiscountAmountCalculated > 0.0 ? formatMoney(finalDiscountAmountCalculated) : "");
-
-                } catch (Exception ignored) { }
+                        inputCantidadDescuento.getEditText().setText(finalDiscountAmountCalculated > 0.0 ? String.format(Locale.getDefault(), "%.2f", finalDiscountAmountCalculated) : "");
+                } catch (Exception ignored) {}
             });
         } else {
             try {
@@ -606,5 +750,13 @@ public class DatosPrincipalesFragment extends Fragment {
                 if (textTotalValue != null) textTotalValue.setText(totalDisplay);
             } catch (Exception ignored) {}
         }
+    }
+
+
+    abstract class SimpleTextWatcher implements TextWatcher {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
 }

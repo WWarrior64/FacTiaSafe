@@ -85,13 +85,19 @@
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp">
 
-                    <AutoCompleteTextView
+                    <!-- sustituye este bloque dentro de TextInputLayout -->
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
                         android:id="@+id/auto_complete_categoria"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="none"
                         android:text="@string/compras_personales"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:clickable="true"
+                        android:inputType="none"
+                        android:importantForAutofill="no" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
@@ -141,28 +147,36 @@
             app:strokeColor="?attr/colorOnSecondaryFixed"
             app:strokeWidth="1dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <!-- Frame para contener la imagen y un overlay placeholder encima -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?attr/colorOnPrimary"
-                android:padding="16dp">
+                android:background="?attr/colorOnPrimary">
 
+                <!-- Imagen del producto (rellena la tarjeta). El fragment la actualizará con setImageURI(...) -->
+                <ImageView
+                    android:id="@+id/image_product_thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/fotografia_art"
+                    android:visibility="gone" />
+
+                <!-- Overlay que muestra icono + texto cuando NO hay imagen -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:id="@+id/photo_placeholder_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:gravity="center"
+                    android:padding="16dp">
 
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:contentDescription="@string/agregar_foto"
-                        android:src="@drawable/ic_image_import"
-                        app:tint="?attr/colorPrimary" />
+                        app:srcCompat="@drawable/ic_image_import"
+                        android:importantForAccessibility="no" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -172,8 +186,9 @@
                         android:textColor="?attr/colorOnSecondaryFixed"
                         android:textSize="14sp" />
                 </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
+
 
         <TextView
             android:id="@+id/label_datos_extras_titulo_notas"

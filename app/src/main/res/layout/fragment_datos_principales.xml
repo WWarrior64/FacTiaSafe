@@ -196,6 +196,7 @@
                         android:textSize="14sp" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_impuesto"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
                         android:checked="true"

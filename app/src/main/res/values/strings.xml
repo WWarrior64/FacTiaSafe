@@ -86,7 +86,7 @@
     <string name="compras_personales">Compras personales</string>
     <string name="ej_sucursal">p. ej. Sucursal Santa Ana</string>
     <string name="notas_extras">Notas Legales / Extras</string>
-    <string name="fotografia_art">Fotografía del artículo</string>
+    <string name="fotografia_art">Fotografía de la factura</string>
     <string name="detalles">Detalles</string>
     <string name="agrega_foto_art">Añade una fotografía del artículo o artículos adquiridos en esta factura</string>
 </resources>

@@ -1,9 +1,7 @@
 package sv.edu.catolica.factiasafe;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -140,15 +138,11 @@ public class EditarFacturaActivity extends AppCompatActivity {
                     new Object[]{companyName, externalId, date, subtotal, taxPct, taxAmount, discountPct, discountAmount, total, currency, notas, invoiceId}
             );
 
-            // Si guardas store_id / category_id en invoices en lugar de nombres,
-            // aquí tendrías que convertir tienda/categoria a sus IDs y actualizar:
-            // p.ej. db.execSQL("UPDATE invoices SET store_id = ? WHERE id = ?", new Object[]{storeId, invoiceId});
-
-            // Llamar al fragment para que guarde items + thumbnail + warranty usando la misma db
             principalesFragment.saveIntoDatabase(db);
 
-            // Si extraFragment necesita guardar relaciones adicionales en otras tablas,
-            // crea un método similar en extraFragment y llámalo aquí pasando 'db'.
+            if (extraFragment != null) {
+                extraFragment.saveIntoDatabase(db);
+            }
 
             db.setTransactionSuccessful();
             Toast.makeText(this, "Factura actualizada", Toast.LENGTH_SHORT).show();
