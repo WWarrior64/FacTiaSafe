@@ -71,6 +71,8 @@
     <string name="prod_cant_pre">Producto ; Cantidad ; Precio</string>
     <string name="cerrar">cerrar</string>
     <string name="editar">Editar</string>
+    <string name="borrar">Borrar</string>
+    <string name="exportar_pdf">Exportar PDF</string>
     <string name="listo">Listo</string>
     <string name="descrip_factura">se muestra la factura</string>
     <string name="recortar">Recortar</string>

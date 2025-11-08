@@ -13,7 +13,7 @@ import java.io.OutputStream;
 
 public class FaSafeDB extends SQLiteOpenHelper {
     private static final String DB_NAME = "factia_safe.sqlite";
-    private static final int DB_VERSION = 7; // Incrementar para upgrades
+    private static final int DB_VERSION = 8; // Incrementar para upgrades
     private final Context context;
     private final String dbPath;
     private boolean isDatabaseCopied = false; // Flag para evitar copias múltiples

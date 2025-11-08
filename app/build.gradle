@@ -36,6 +36,7 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.play.services.mlkit.document.scanner
     implementation libs.picasso
+    implementation libs.documentfile
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

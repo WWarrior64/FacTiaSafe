@@ -74,7 +74,7 @@
                             android:id="@+id/label_productos"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Incluir Productos"
+                            android:text="Incluir Productos / Tiendas"
                             android:textColor="?attr/colorOnSecondary"
                             android:textAppearance="?attr/textAppearanceBodyLarge"
                             android:textSize="18sp"
@@ -105,39 +105,6 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:background="?attr/colorOnTertiary"/>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="16dp">
-                        <TextView
-                            android:id="@+id/label_tiendas"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Incluir Tiendas"
-                            android:textColor="?attr/colorOnSecondary"
-                            android:textAppearance="?attr/textAppearanceBodyLarge"
-                            android:textSize="18sp"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Añade las fotos al PDF"
-                            android:textColor="?attr/colorOnSecondaryFixed"
-                            android:textAppearance="?attr/textAppearanceBodySmall"
-                            android:textSize="14sp"
-                            app:layout_constraintTop_toBottomOf="@id/label_tiendas"
-                            app:layout_constraintStart_toStartOf="parent" />
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switch_incluir_tiendas"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="false"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

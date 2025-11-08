@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -29,6 +28,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -52,9 +52,10 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
     private FaSafeDB dbHelper;
 
     // Launcher para seleccionar carpeta (Storage Access Framework)
-    // usar Uri contract: lanzaremos con launch(null)
     private ActivityResultLauncher<Uri> dirPickerLauncher;
 
+    // URI inicial sugerida para Documents
+    private static final Uri INITIAL_DOCUMENTS_URI = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADocuments");
 
 
     @Override
@@ -71,41 +72,57 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
 
         dbHelper = new FaSafeDB(this);
 
-        // Registrar launcher (OpenDocumentTree) para escoger carpeta
-        // registrar launcher para OpenDocumentTree
+        // Registrar launcher para OpenDocumentTree
         dirPickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.OpenDocumentTree(),
                 uri -> {
                     if (uri != null) {
+                        // Tomar permisos persistentes
+                        final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
                         try {
-                            final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                            // pide permisos persistentes a la URI seleccionada
                             getContentResolver().takePersistableUriPermission(uri, takeFlags);
                         } catch (Exception ignored) {}
 
-                        String uriStr = uri.toString();
+                        // Crear subcarpetas FactiaSafe/Facturas
+                        DocumentFile rootDir = DocumentFile.fromTreeUri(this, uri);
+                        if (rootDir == null) {
+                            Toast.makeText(this, "Error al acceder a la carpeta seleccionada", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        DocumentFile factiaDir = findOrCreateDir(rootDir, "FactiaSafe");
+                        if (factiaDir == null) {
+                            Toast.makeText(this, "Error al crear carpeta FactiaSafe", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        DocumentFile facturasDir = findOrCreateDir(factiaDir, "Facturas");
+                        if (facturasDir == null) {
+                            Toast.makeText(this, "Error al crear carpeta Facturas", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        String uriStr = facturasDir.getUri().toString();
                         setSetting(KEY_PDF_PATH, uriStr);
                         labelRuta.setText(displayPathFromString(uriStr));
-                        Toast.makeText(this, "Ruta seleccionada y guardada", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Ruta pública seleccionada y guardada", Toast.LENGTH_SHORT).show();
                     } else {
-                        // usuario canceló -> fallback a carpeta privada
-                        createPrivateAppFolderAndShow();
+                        // Usuario canceló
+                        Toast.makeText(this, "Selección cancelada: no se cambió la ruta", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
-
 
         inicializarVistas();
         setupToolbar();
         cargarPreferencias();
         setupListeners();
-        ensureDefaultPdfFolderExists();
+        // Removed ensureDefaultPdfFolderExists() from here to run on app launch instead
     }
 
     private void inicializarVistas() {
         toolbar = findViewById(R.id.toolbar);
         switchProductos = findViewById(R.id.switch_incluir_productos);
-        switchTiendas = findViewById(R.id.switch_incluir_tiendas);
         layoutCambiarRuta = findViewById(R.id.layout_cambiar_ruta);
         layoutGestionarCategorias = findViewById(R.id.layout_gestionar_categorias);
         btnGuardarConfiguracion = findViewById(R.id.btn_guardar_configuracion);
@@ -134,166 +151,19 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
             switchTiendas.setChecked(Boolean.parseBoolean(sTiendas));
         }
         if (sRuta != null && !sRuta.isEmpty()) {
-            // Mostrar ruta de forma amigable (intenta mostrar último segmento)
-            try {
-                labelRuta.setText(displayPathFromString(sRuta));
-            } catch (Exception e) {
-                labelRuta.setText(sRuta);
-            }
+            // Mostrar ruta de forma amigable
+            labelRuta.setText(displayPathFromString(sRuta));
         } else {
             // valor por defecto
             labelRuta.setText("/Documents/FactiaSafe/Facturas");
         }
     }
 
-    // -----------------------------------------------------------------
-// Constantes
-// -----------------------------------------------------------------
-    private static final int REQ_WRITE_STORAGE = 42;
-    private static final int REQ_PICK_FOLDER = 99; // para SAF (Android 10+)
-
-    // -----------------------------------------------------------------
-// Método adaptado: crear carpeta por defecto y mostrarla (SAF para Q+)
-// -----------------------------------------------------------------
-    private void ensureDefaultPdfFolderExists() {
-        // 1) Si ya hay ruta configurada, mostrarla y salir.
-        String sRuta = getSetting(KEY_PDF_PATH);
-        if (!TextUtils.isEmpty(sRuta)) {
-            // sRuta puede ser una ruta absoluta (Android <=28) o una URI (content://...) para SAF
-            labelRuta.setText(displayPathFromString(sRuta));
-            return;
-        }
-
-        // 2) Distinción por versión Android
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            // Android 9 y menores: pedimos WRITE_EXTERNAL_STORAGE si no lo tenemos
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                        this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQ_WRITE_STORAGE
-                );
-                return; // esperamos respuesta en onRequestPermissionsResult
-            }
-
-            // Tenemos permiso -> crear carpeta pública Documents/FactiaSafe/Facturas
-            try {
-                File publicDocs = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-                File targetDir = new File(publicDocs, "FactiaSafe/Facturas");
-                if (!targetDir.exists()) {
-                    boolean ok = targetDir.mkdirs();
-                    // Si falla, seguimos pero mostramos la ruta absoluta de fallback
-                    if (!ok) {
-                        labelRuta.setText(targetDir.getAbsolutePath());
-                        // opcional: guardar también en settings (texto)
-                        setSetting(KEY_PDF_PATH, targetDir.getAbsolutePath());
-                        return;
-                    }
-                }
-                // Todo ok: mostramos y guardamos la ruta absoluta
-                labelRuta.setText(targetDir.getAbsolutePath());
-                setSetting(KEY_PDF_PATH, targetDir.getAbsolutePath());
-            } catch (Exception e) {
-                // Fallback: mostrar ruta por defecto
-                labelRuta.setText("/Documents/FactiaSafe/Facturas");
-            }
-        } else {
-            // Android 10+ -> usar SAF (ACTION_OPEN_DOCUMENT_TREE). Pedimos al usuario seleccionar carpeta.
-            // Abrimos el selector SOLO si no hay ruta configurada (ya comprobado arriba).
-            try {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
-                // Lanza con el launcher en lugar de startActivityForResult
-                dirPickerLauncher.launch(null);
-            } catch (Exception e) {
-                createPrivateAppFolderAndShow();
-            }
-        }
-    }
-
-    private void createPrivateAppFolderAndShow() {
-        try {
-            File docs = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-            File targetDir = new File(docs, "FactiaSafe/Facturas");
-            if (!targetDir.exists()) targetDir.mkdirs();
-            labelRuta.setText(targetDir.getAbsolutePath());
-            setSetting(KEY_PDF_PATH, targetDir.getAbsolutePath());
-        } catch (Exception ignored) {
-            labelRuta.setText("/Documents/FactiaSafe/Facturas");
-        }
-    }
-
-
-    // -----------------------------------------------------------------
-// Resultado de permisos (ya lo tienes, lo complementamos para SAF)
-// -----------------------------------------------------------------
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQ_WRITE_STORAGE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Reintentar crear la carpeta pública ahora que tenemos permiso
-                ensureDefaultPdfFolderExists();
-            } else {
-                // El usuario negó permiso -> usar carpeta privada
-                try {
-                    File docs = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-                    File targetDir = new File(docs, "FactiaSafe/Facturas");
-                    if (!targetDir.exists()) targetDir.mkdirs();
-                    labelRuta.setText(targetDir.getAbsolutePath());
-                    setSetting(KEY_PDF_PATH, targetDir.getAbsolutePath());
-                } catch (Exception ignored) {
-                    labelRuta.setText("/Documents/FactiaSafe/Facturas");
-                }
-                Toast.makeText(this, "Permiso denegado: se usará carpeta privada de la app.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    // -----------------------------------------------------------------
-// Manejar resultado de SAF (cuando el usuario escoge carpeta en Android 10+)
-// -----------------------------------------------------------------
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQ_PICK_FOLDER) {
-            if (resultCode == RESULT_OK && data != null) {
-                Uri treeUri = data.getData();
-                if (treeUri != null) {
-                    try {
-                        // Pedir permisos persistentes sobre la URI elegida
-                        final int takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                        getContentResolver().takePersistableUriPermission(treeUri, takeFlags);
-                    } catch (Exception ignored) {}
-
-                    // Guardar la URI como string en settings y mostrar friendly label
-                    String uriStr = treeUri.toString();
-                    setSetting(KEY_PDF_PATH, uriStr);
-                    labelRuta.setText(displayPathFromString(uriStr));
-                    Toast.makeText(this, "Ruta seleccionada y guardada", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // Usuario canceló -> fallback a carpeta privada de la app
-                try {
-                    File docs = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-                    File targetDir = new File(docs, "FactiaSafe/Facturas");
-                    if (!targetDir.exists()) targetDir.mkdirs();
-                    labelRuta.setText(targetDir.getAbsolutePath());
-                    setSetting(KEY_PDF_PATH, targetDir.getAbsolutePath());
-                } catch (Exception ignored) {
-                    labelRuta.setText("/Documents/FactiaSafe/Facturas");
-                }
-            }
-        }
-    }
-
-
     private void setupListeners() {
         // Guardar al pulsar botón
         btnGuardarConfiguracion.setOnClickListener(v -> guardarPreferencias());
 
-        // Abrir selector de ruta al pulsar en el layout
+        // Abrir selector de ruta al pulsar en el layout (para cambiar a custom)
         layoutCambiarRuta.setOnClickListener(v -> abrirSelectorRuta());
 
         // Abrir actividad de categorías (ya la tienes)
@@ -312,18 +182,8 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
     }
 
     private void abrirSelectorRuta() {
-        try {
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
-            // opcional: abrir en Documents (no siempre funciona)
-            // intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri);
-            dirPickerLauncher.launch(null);
-        } catch (Exception e) {
-            Toast.makeText(this, "No se pudo abrir el selector de carpetas: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            createPrivateAppFolderAndShow();
-        }
+        dirPickerLauncher.launch(INITIAL_DOCUMENTS_URI);
     }
-
 
     public void abrirCategorias(View view) {
         Intent ventana = new Intent(PreferenciasPdfActivity.this, CategoriasActivity.class);
@@ -371,21 +231,52 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
         }
     }
 
-    // ---------- Utilities para mostrar ruta de forma legible ----------
-    private String displayPathFromUri(Uri uri) {
-        if (uri == null) return "";
-        return displayPathFromString(uri.toString());
+    // ---------- Helper para crear o encontrar directorio en SAF ----------
+    private DocumentFile findOrCreateDir(DocumentFile parent, String name) {
+        // Buscar si existe
+        for (DocumentFile file : parent.listFiles()) {
+            if (file.isDirectory() && name.equals(file.getName())) {
+                return file;
+            }
+        }
+        // Crear nuevo
+        return parent.createDirectory(name);
     }
 
-    private String displayPathFromString(String uriStr) {
-        // Intentamos humanizar la URI: si es content://... muestra último path segment o el URI simple.
-        try {
-            Uri u = Uri.parse(uriStr);
-            String last = u.getLastPathSegment();
-            if (last != null && !last.isEmpty()) return last;
-            return uriStr;
-        } catch (Exception e) {
-            return uriStr;
+    // ---------- Utilities para mostrar ruta de forma legible ----------
+    private String displayPathFromString(String pathStr) {
+        if (pathStr.startsWith("content://")) {
+            // Para URIs de SAF
+            try {
+                Uri u = Uri.parse(pathStr);
+                String segment = u.getLastPathSegment();
+                if (segment != null) {
+                    int colonIndex = segment.indexOf(':');
+                    if (colonIndex != -1) {
+                        String volume = segment.substring(0, colonIndex);
+                        String docPath = segment.substring(colonIndex + 1);
+                        if ("primary".equals(volume)) {
+                            return "/" + docPath;
+                        } else {
+                            return "/" + volume + "/" + docPath;
+                        }
+                    }
+                    return "/" + segment;
+                }
+            } catch (Exception e) {}
+            return pathStr;
+        } else {
+            // Para rutas relativas o absolutas
+            if (pathStr.startsWith("/")) {
+                int index = pathStr.indexOf("/Documents/");
+                if (index != -1) {
+                    return pathStr.substring(index);
+                }
+                return pathStr;
+            } else {
+                // Relativa, agregar /
+                return "/" + pathStr;
+            }
         }
     }
 }
