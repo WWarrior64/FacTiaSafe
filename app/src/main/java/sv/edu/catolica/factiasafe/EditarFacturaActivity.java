@@ -75,6 +75,8 @@ public class EditarFacturaActivity extends AppCompatActivity {
 
         // Manejar el botón de Guardar
         buttonGuardar.setOnClickListener(v -> saveChanges());
+        // Activar el botón de volver atrás en la toolbar
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void saveChanges() {

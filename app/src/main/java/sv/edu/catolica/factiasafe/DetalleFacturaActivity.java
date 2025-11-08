@@ -32,7 +32,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             textoFechaInicioGarantia, textoFechaFinGarantia, textoGarantia,
             textoTiendaComercio, textoCategoria, textoItems, textoDatosExtras;
 
-    private ImageView imagenFactura;
+    private ImageView imagenFactura, imagenProducto;
 
     private ImageButton botonVolver;
 
@@ -68,6 +68,13 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         setButtonListeners();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Cargar datos cada vez que la actividad se resume (se carga o regresa)
+        loadInvoiceData();
+    }
+
     private void initializeViews() {
         botonVolver = findViewById(R.id.boton_volver);
         textoNombreEmpresa = findViewById(R.id.texto_nombre_empresa);
@@ -88,6 +95,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         textoItems = findViewById(R.id.texto_items);
         textoDatosExtras = findViewById(R.id.texto_datos_extras);
         imagenFactura = findViewById(R.id.imagen_factura);
+        imagenProducto = findViewById(R.id.imagen_producto);
         actionEditar = findViewById(R.id.action_editar);
         actionBorrar = findViewById(R.id.action_borrar);
         actionCancelar = findViewById(R.id.action_cancelar);
@@ -119,6 +127,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         String currency = invoiceCursor.getString(invoiceCursor.getColumnIndexOrThrow("currency"));
         String notes = invoiceCursor.getString(invoiceCursor.getColumnIndexOrThrow("notes"));
         String thumbnailPath = invoiceCursor.getString(invoiceCursor.getColumnIndexOrThrow("thumbnail_path"));
+        String productImagePath = invoiceCursor.getString(invoiceCursor.getColumnIndexOrThrow("product_image_path"));
         int storeId = invoiceCursor.getInt(invoiceCursor.getColumnIndexOrThrow("store_id"));
         int categoryId = invoiceCursor.getInt(invoiceCursor.getColumnIndexOrThrow("category_id"));
 
@@ -145,6 +154,19 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             }
         } else {
             imagenFactura.setImageResource(R.drawable.factura_placeholder4); // Placeholder si path null o vacío
+        }
+
+        // Cargar imagen del producto si existe
+        if (productImagePath != null && !productImagePath.isEmpty()) {
+            Bitmap bitmap = BitmapFactory.decodeFile(productImagePath);
+            if (bitmap != null) {
+                imagenProducto.setImageBitmap(bitmap);
+            } else {
+                // Fallback si bitmap es null
+                imagenProducto.setImageResource(R.drawable.factura_placeholder4); // Usa el mismo placeholder o crea uno nuevo para "sin foto de producto"
+            }
+        } else {
+            imagenProducto.setImageResource(R.drawable.factura_placeholder4); // Placeholder si path null o vacío, asume que representa "sin foto de producto"
         }
 
         // Cargar nombre de la tienda

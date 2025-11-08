@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginBottom="8dp"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
@@ -20,35 +19,65 @@
             android:id="@+id/invoice_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="16sp"
+            android:layout_marginEnd="8dp"
             android:textColor="@android:color/black"
-            tools:text="Factura 1 Ejemplo"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/invoice_thumbnail"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/invoice_thumbnail"
-            android:layout_marginEnd="8dp"/>
+            tools:text="Factura 1 Ejemplo" />
 
         <TextView
             android:id="@+id/invoice_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
-            tools:text="Información relevante: 08/Oct/2025 - $150.00"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/invoice_thumbnail"
-            app:layout_constraintTop_toBottomOf="@id/invoice_title"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/invoice_thumbnail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/invoice_title"
+            tools:text="08/Oct/2025 - $150.00" />
+
+        <TextView
+            android:id="@+id/invoice_subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@android:color/darker_gray"
+            android:visibility="visible"
+            app:layout_constraintEnd_toStartOf="@id/invoice_thumbnail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/invoice_info" />
+
+        <TextView
+            android:id="@+id/invoice_notes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@android:color/darker_gray"
+            android:visibility="visible"
+            app:layout_constraintEnd_toStartOf="@id/invoice_thumbnail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/invoice_subtitle" />
 
         <ImageView
             android:id="@+id/invoice_thumbnail"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:scaleType="centerCrop"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="0dp"
             android:background="@android:color/darker_gray"
             android:contentDescription="Miniatura de la factura"
+            android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

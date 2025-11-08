@@ -31,8 +31,7 @@
                 app:chipBackgroundColor="?attr/colorPrimary"
                 android:textColor="?attr/colorOnPrimary"
                 app:chipCornerRadius="8dp"
-                app:chipStrokeWidth="0dp"
-                style="@style/Widget.MaterialComponents.Chip.Filter" />
+                app:chipStrokeWidth="0dp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_recientes"
@@ -44,8 +43,7 @@
                 android:textColor="?attr/colorOnSecondary"
                 app:chipCornerRadius="8dp"
                 app:chipStrokeColor="?attr/colorOnSecondaryFixed"
-                app:chipStrokeWidth="1dp"
-                style="@style/Widget.MaterialComponents.Chip.Filter" />
+                app:chipStrokeWidth="1dp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_antiguos"
@@ -57,8 +55,7 @@
                 android:textColor="?attr/colorOnSecondary"
                 app:chipCornerRadius="8dp"
                 app:chipStrokeColor="?attr/colorOnSecondaryFixed"
-                app:chipStrokeWidth="1dp"
-                style="@style/Widget.MaterialComponents.Chip.Filter" />
+                app:chipStrokeWidth="1dp" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_este_mes"
@@ -70,8 +67,7 @@
                 android:textColor="?attr/colorOnSecondary"
                 app:chipCornerRadius="8dp"
                 app:chipStrokeColor="?attr/colorOnSecondaryFixed"
-                app:chipStrokeWidth="1dp"
-                style="@style/Widget.MaterialComponents.Chip.Filter" />
+                app:chipStrokeWidth="1dp" />
         </LinearLayout>
     </HorizontalScrollView>
 

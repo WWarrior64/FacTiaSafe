@@ -89,4 +89,5 @@
     <string name="fotografia_art">Fotografía de la factura</string>
     <string name="detalles">Detalles</string>
     <string name="agrega_foto_art">Añade una fotografía del artículo o artículos adquiridos en esta factura</string>
+    <string name="foto_producto">Fotografía del producto</string>
 </resources>

@@ -183,7 +183,7 @@
                         android:contentDescription="Carpeta"/>
 
                     <TextView
-                        android:id="@+id/label_ruta"
+                        android:id="@+id/label_titulo_ruta"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Almacenamiento"
@@ -196,14 +196,15 @@
                         android:layout_marginStart="16dp"/>
 
                     <TextView
+                        android:id="@+id/label_ruta"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="/Documents/FactiaSafe/Facturas"
                         android:textColor="?attr/colorOnSecondaryFixed"
                         android:textAppearance="?attr/textAppearanceBodySmall"
                         android:textSize="14sp"
-                        app:layout_constraintTop_toBottomOf="@id/label_ruta"
-                        app:layout_constraintStart_toStartOf="@id/label_ruta"
+                        app:layout_constraintTop_toBottomOf="@id/label_titulo_ruta"
+                        app:layout_constraintStart_toStartOf="@id/label_titulo_ruta"
                         app:layout_constraintEnd_toEndOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

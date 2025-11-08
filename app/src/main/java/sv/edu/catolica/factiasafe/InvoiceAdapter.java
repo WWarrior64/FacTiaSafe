@@ -41,6 +41,22 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         String infoText = formattedDate + " - " + invoice.getCurrency() + " " + String.format("%.2f", invoice.getTotal());
         holder.info.setText(infoText);
 
+        String itemsPreview = invoice.getItemsPreview();
+        if (itemsPreview != null && !itemsPreview.isEmpty()) {
+            holder.subtitle.setVisibility(View.VISIBLE);
+            holder.subtitle.setText(itemsPreview);
+        } else {
+            holder.subtitle.setVisibility(View.GONE);
+        }
+
+        String notes = invoice.getNotes();
+        if (notes != null && !notes.isEmpty()) {
+            holder.notes.setVisibility(View.VISIBLE);
+            holder.notes.setText(notes.length() > 100 ? notes.substring(0, 97) + "..." : notes);
+        } else {
+            holder.notes.setVisibility(View.GONE);
+        }
+
         // Cargar thumbnail si existe
         if (invoice.getThumbnailPath() != null && !invoice.getThumbnailPath().isEmpty()) {
             Bitmap bitmap = BitmapFactory.decodeFile(invoice.getThumbnailPath());
@@ -76,12 +92,16 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.InvoiceV
         TextView title;
         TextView info;
         ImageView thumbnail;
+        TextView subtitle;
+        TextView notes;
 
         public InvoiceViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.invoice_title);
             info = itemView.findViewById(R.id.invoice_info);
             thumbnail = itemView.findViewById(R.id.invoice_thumbnail);
+            subtitle = itemView.findViewById(R.id.invoice_subtitle);
+            notes = itemView.findViewById(R.id.invoice_notes);
 
             // Add click listener to the whole item
             itemView.setOnClickListener(v -> {
