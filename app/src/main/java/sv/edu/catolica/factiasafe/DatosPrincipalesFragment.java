@@ -2,6 +2,7 @@ package sv.edu.catolica.factiasafe;
 
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -38,7 +39,9 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class DatosPrincipalesFragment extends Fragment {
@@ -631,10 +634,6 @@ public class DatosPrincipalesFragment extends Fragment {
         return Math.round(v * 100.0) / 100.0;
     }
 
-    /**
-     * Guarda items, thumbnail_path y warranty usando la SQLiteDatabase proporcionada.
-     * NO inicia ni termina transacción (la Activity debe hacerlo).
-     */
     public void saveIntoDatabase(SQLiteDatabase db) throws Exception {
         if (invoiceId == -1 || db == null) return;
 
@@ -651,14 +650,38 @@ public class DatosPrincipalesFragment extends Fragment {
         String start = editGarantiaStart != null ? editGarantiaStart.getText().toString() : "";
         String end = editGarantiaEnd != null ? editGarantiaEnd.getText().toString() : "";
         Cursor checkWarranty = db.rawQuery("SELECT id FROM warranties WHERE invoice_id = ?", new String[]{String.valueOf(invoiceId)});
-        if (checkWarranty.moveToFirst()) {
-            db.execSQL("UPDATE warranties SET warranty_start = ?, warranty_end = ? WHERE invoice_id = ?",
-                    new Object[]{start, end, invoiceId});
-        } else if (!TextUtils.isEmpty(start) && !TextUtils.isEmpty(end)) {
-            db.execSQL("INSERT INTO warranties (invoice_id, warranty_start, warranty_end) VALUES (?, ?, ?)",
-                    new Object[]{invoiceId, start, end});
+        try {
+            int reminderDays = getReminderDaysDefault(db);
+            String productName = getCompanyName();
+            Integer invoiceItemId = null;
+
+            ContentValues cv = new ContentValues();
+            if (invoiceItemId != null) cv.put("invoice_item_id", invoiceItemId);
+            else cv.putNull("invoice_item_id");
+            cv.put("product_name", productName != null ? productName : "");
+            cv.put("warranty_start", start);
+            cv.put("warranty_end", end);
+            cv.put("warranty_months", calculateMonthsBetween(start, end));
+            cv.put("reminder_days_before", reminderDays);
+            // REMOVIDO: cv.put("notify_at", ... ) — ya no necesario, múltiples notifs
+            cv.put("status", "active");
+            cv.put("notes", "");
+
+            if (checkWarranty.moveToFirst()) {
+                int warrantyId = checkWarranty.getInt(0);
+                db.update("warranties", cv, "id = ?", new String[]{ String.valueOf(warrantyId) });
+                // Eliminar notifs previas
+                db.delete("notifications", "source_table = ? AND source_id = ?", new String[]{"warranties", String.valueOf(warrantyId)});
+            } else {
+                if (!TextUtils.isEmpty(start) && !TextUtils.isEmpty(end)) {
+                    long row = db.insert("warranties", null, cv);
+                    // No agregar a toSchedule
+                }
+            }
+        } finally {
+            if (checkWarranty != null) checkWarranty.close();
         }
-        checkWarranty.close();
+
 
         // 4) Leer porcentajes / montos desde UI (uso safeParse para evitar NPE/format errors)
         double taxPctInput = 0.0;
@@ -752,6 +775,38 @@ public class DatosPrincipalesFragment extends Fragment {
         }
     }
 
+    private int getReminderDaysDefault(SQLiteDatabase db) {
+        int def = 7;
+        if (db == null) return def;
+        Cursor c = null;
+        try {
+            c = db.rawQuery("SELECT value FROM settings WHERE [key] = ? LIMIT 1", new String[]{"notifications_lead_time_days"});  // CAMBIO: clave consistente
+            if (c != null && c.moveToFirst()) {
+                String v = c.isNull(0) ? "" : c.getString(0);
+                try { def = Integer.parseInt(v); } catch (Exception ignored) {}
+            }
+        } catch (Exception ignored) { }
+        finally { if (c != null) c.close(); }
+        return def;
+    }
+
+    private int calculateMonthsBetween(String startYYYYMMDD, String endYYYYMMDD) {
+        if (TextUtils.isEmpty(startYYYYMMDD) || TextUtils.isEmpty(endYYYYMMDD)) return 0;
+        try {
+            java.util.Date s = sdf.parse(startYYYYMMDD);
+            java.util.Date e = sdf.parse(endYYYYMMDD);
+            if (s == null || e == null) return 0;
+            Calendar cs = Calendar.getInstance(); cs.setTime(s);
+            Calendar ce = Calendar.getInstance(); ce.setTime(e);
+            int years = ce.get(Calendar.YEAR) - cs.get(Calendar.YEAR);
+            int months = ce.get(Calendar.MONTH) - cs.get(Calendar.MONTH);
+            int total = years * 12 + months;
+            if (ce.get(Calendar.DAY_OF_MONTH) < cs.get(Calendar.DAY_OF_MONTH)) total--;
+            return Math.max(0, total);
+        } catch (Exception ex) {
+            return 0;
+        }
+    }
 
     abstract class SimpleTextWatcher implements TextWatcher {
         @Override
@@ -759,4 +814,5 @@ public class DatosPrincipalesFragment extends Fragment {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {}
     }
+
 }

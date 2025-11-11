@@ -1,7 +1,11 @@
 package sv.edu.catolica.factiasafe;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,6 +21,9 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditarFacturaActivity extends AppCompatActivity {
 
@@ -80,35 +87,36 @@ public class EditarFacturaActivity extends AppCompatActivity {
     }
 
     private void saveChanges() {
-        // obtener fragments desde el adapter guardado
+    // obtener fragments desde el adapter guardado
         if (pagerAdapter == null) {
             Toast.makeText(this, "Error interno: adapter no inicializado", Toast.LENGTH_SHORT).show();
             return;
         }
-
         Fragment f0 = pagerAdapter.getFragment(0);
         Fragment f1 = pagerAdapter.getFragment(1);
-
         if (!(f0 instanceof DatosPrincipalesFragment)) {
             // fallback: intentar buscar en FragmentManager
             for (Fragment fr : getSupportFragmentManager().getFragments()) {
-                if (fr instanceof DatosPrincipalesFragment) { f0 = fr; break; }
+                if (fr instanceof DatosPrincipalesFragment) {
+                    f0 = fr;
+                    break;
+                }
             }
         }
         if (!(f1 instanceof DatosExtraFragment)) {
             for (Fragment fr : getSupportFragmentManager().getFragments()) {
-                if (fr instanceof DatosExtraFragment) { f1 = fr; break; }
+                if (fr instanceof DatosExtraFragment) {
+                    f1 = fr;
+                    break;
+                }
             }
         }
-
         if (!(f0 instanceof DatosPrincipalesFragment)) {
             Toast.makeText(this, "No se encontró DatosPrincipalesFragment", Toast.LENGTH_SHORT).show();
             return;
         }
-
         DatosPrincipalesFragment principalesFragment = (DatosPrincipalesFragment) f0;
         DatosExtraFragment extraFragment = (f1 instanceof DatosExtraFragment) ? (DatosExtraFragment) f1 : null;
-
         // Recolectar datos que se guardan en tabla invoices:
         String companyName = principalesFragment.getCompanyName();
         String externalId = principalesFragment.getExternalId();
@@ -120,7 +128,6 @@ public class EditarFacturaActivity extends AppCompatActivity {
         double discountAmount = principalesFragment.getDiscountAmount();
         double total = principalesFragment.getTotal();
         String currency = principalesFragment.getCurrency();
-
         String tienda = "";
         String categoria = "";
         String notas = "";
@@ -129,32 +136,47 @@ public class EditarFacturaActivity extends AppCompatActivity {
             categoria = extraFragment.getCategoria();
             notas = extraFragment.getNotas();
         }
-
         FaSafeDB dbHelper = new FaSafeDB(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+        boolean schedulingNeeded = false;
+
         db.beginTransaction();
         try {
-            // Actualiza la fila invoices (ajusta columnas según tu esquema real)
+            // Actualiza invoices
             db.execSQL(
                     "UPDATE invoices SET company_name = ?, external_id = ?, date = ?, subtotal = ?, tax_percentage = ?, tax_amount = ?, discount_percentage = ?, discount_amount = ?, total = ?, currency = ?, notes = ? WHERE id = ?",
                     new Object[]{companyName, externalId, date, subtotal, taxPct, taxAmount, discountPct, discountAmount, total, currency, notas, invoiceId}
             );
 
             principalesFragment.saveIntoDatabase(db);
-
-            if (extraFragment != null) {
-                extraFragment.saveIntoDatabase(db);
-            }
+            if (extraFragment != null) extraFragment.saveIntoDatabase(db);
 
             db.setTransactionSuccessful();
             Toast.makeText(this, "Factura actualizada", Toast.LENGTH_SHORT).show();
-            finish();
+
+            // señalamos que hay que re-crear notificaciones cuando la transacción termine
+            schedulingNeeded = true;
+
         } catch (Exception e) {
             Toast.makeText(this, "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         } finally {
             try { db.endTransaction(); } catch (Exception ignored) {}
             try { db.close(); } catch (Exception ignored) {}
+            try { dbHelper.close(); } catch (Exception ignored) {}
         }
+
+        // --- AHORA, fuera de la transacción y con la DB cerrada, lanzamos el re-scheduler ---
+        if (schedulingNeeded) {
+            new Thread(() -> {
+                try {
+                    NotificacionRescheduler.recreateAndScheduleAllWarrantyNotifications(getApplicationContext());
+                } catch (Exception ex) {
+                    android.util.Log.e("EditarFacturaActivity", "Error scheduling after save: " + ex.getMessage(), ex);
+                }
+            }).start();
+        }
+
+        finish();
     }
 }
