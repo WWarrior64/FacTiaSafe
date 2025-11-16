@@ -103,7 +103,6 @@ public class EscanearActivity extends AppCompatActivity {
         opcionEditar = findViewById(R.id.opcion_editar);
         opcionDetalles = findViewById(R.id.opcion_detalles);
         opcionEditar.setOnClickListener(v -> abrirEditorImagen());
-        opcionDetalles.setOnClickListener(v -> abrirDetalles());
     }
 
     @Override
@@ -1720,50 +1719,6 @@ public class EscanearActivity extends AppCompatActivity {
         }
     }
 
-    /** Listener para recibir resultados de Tesseract (devuelve texto y region usada) */
-    public interface OnTessResultListener {
-        void onResult(String text, Rect region);
-    }
-
-    /** Ejecuta tesseract sobre una region del bitmap (async), devuelve resultado via listener en UI thread */
-    private void runTesseractOnRegionAsync(final Bitmap sourceBitmap, final Rect bbox, final String langs, final int psm, final String whitelist, final OnTessResultListener listener) {
-        ocrExecutor.submit(() -> {
-            try {
-                int pad = Math.max(4, (int)(Math.min(bbox.width(), bbox.height()) * 0.06f));
-                int left = Math.max(0, bbox.left - pad);
-                int top = Math.max(0, bbox.top - pad);
-                int right = Math.min(sourceBitmap.getWidth(), bbox.right + pad);
-                int bottom = Math.min(sourceBitmap.getHeight(), bbox.bottom + pad);
-                if (right <= left || bottom <= top) {
-                    runOnUiThread(() -> {
-                        if (listener != null) listener.onResult("", bbox);
-                    });
-                    return;
-                }
-                Bitmap crop = Bitmap.createBitmap(sourceBitmap, left, top, right - left, bottom - top);
-                if (tess == null) initTess(langs == null ? "eng+spa" : langs);
-                if (whitelist != null) tess.setVariable("tessedit_char_whitelist", whitelist);
-                tess.setPageSegMode(psm);
-                tess.setImage(crop);
-                String text = tess.getUTF8Text();
-                if (text != null) text = text.trim();
-                try {
-                    crop.recycle();
-                } catch (Exception ignored) {}
-                final String finalText = text == null ? "" : text;
-                final Rect region = new Rect(left, top, right, bottom);
-                runOnUiThread(() -> {
-                    if (listener != null) listener.onResult(finalText, region);
-                });
-            } catch (Exception e) {
-                Log.e(TAG, "Error runTesseractOnRegionAsync: " + e.getMessage());
-                runOnUiThread(() -> {
-                    if (listener != null) listener.onResult("", bbox);
-                });
-            }
-        });
-    }
-
     // ==================== Resto de tu UI / navegación / fragments (sin cambios) ====================
 
     private void crearFragmentConImagen(String photoPath) {
@@ -1771,14 +1726,6 @@ public class EscanearActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(FRAGMENT_CONTAINER_ID, fragmentConImagen, "IMAGEN_TAG")
                 .commitNow();
-    }
-
-    private void crearFragmentVacio() {
-        imagenEscaneadaPath = null;
-        EscanearImagenFragment fragmentVacio = EscanearImagenFragment.newInstance(null);
-        getSupportFragmentManager().beginTransaction()
-                .replace(FRAGMENT_CONTAINER_ID, fragmentVacio, "IMAGEN_TAG")
-                .commit();
     }
 
     private EscanearImagenFragment obtenerFragmentImagenActual() {
@@ -1828,25 +1775,7 @@ public class EscanearActivity extends AppCompatActivity {
         bottomBar.setVisibility(View.VISIBLE);
     }
 
-    public void mostrarVistaTexto(View view) {
-        botonTexto.setBackgroundResource(R.drawable.fondo_seleccionado4);
-        botonTexto.setTextColor(getResources().getColor(android.R.color.white, getTheme()));
 
-        botonImagen.setBackgroundResource(android.R.color.transparent);
-        botonImagen.setTextColor(obtenerColor(com.google.android.material.R.attr.colorOnSecondaryFixed));
-
-        if (textoFragment == null) {
-            textoFragment = new EscanearTextoFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("datos_extraidos", datosExtraidos);
-            bundle.putString("imagen_path", imagenEscaneadaPath);
-            textoFragment.setArguments(bundle);
-        } else if (datosExtraidos != null) {
-            textoFragment.actualizarConDatos(datosExtraidos);
-        }
-        cambiarFragment(textoFragment, "TEXTO_TAG");
-        bottomBar.setVisibility(View.GONE);
-    }
 
     private int obtenerColor(int atributo) {
         android.util.TypedValue valorTipeado = new android.util.TypedValue();
@@ -1862,16 +1791,43 @@ public class EscanearActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void abrirDetalles() {
-        Intent intent = new Intent(this, DetallesActivity.class);
-        if (datosExtraidos != null) {
-            intent.putExtra("datos_extraidos", datosExtraidos); // Serializable
-        }
-        startActivity(intent);
-    }
-
     public void lanzarEscaner() {
         Intent intent = new Intent(this, CameraEscaneoActivity.class);
         scannerLauncher.launch(intent);
+    }
+
+    public void mostrarVistaTexto(View view) {
+        botonTexto.setBackgroundResource(R.drawable.fondo_seleccionado4);
+        botonTexto.setTextColor(getResources().getColor(android.R.color.white, getTheme()));
+
+        botonImagen.setBackgroundResource(android.R.color.transparent);
+        botonImagen.setTextColor(obtenerColor(com.google.android.material.R.attr.colorOnSecondaryFixed));
+
+        // Crear fragment de texto y pasar datos
+        if (textoFragment == null) {
+            textoFragment = new EscanearTextoFragment();
+        }
+
+        // Pasar datos a través de Bundle
+        Bundle bundle = new Bundle();
+        if (datosExtraidos != null) {
+            bundle.putSerializable("datos_extraidos", datosExtraidos);
+        }
+        if (imagenEscaneadaPath != null) {
+            bundle.putString("imagen_path", imagenEscaneadaPath);
+        }
+        if (textoOcrCrudo != null) {
+            bundle.putString("ocr_text", textoOcrCrudo);
+        }
+        textoFragment.setArguments(bundle);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(FRAGMENT_CONTAINER_ID, textoFragment, "TEXTO_TAG");
+        transaction.commit();
+        fragmentTagActual = "TEXTO_TAG";
+
+        // Actualizar visibilidad
+        fragmentTextoContainer.setVisibility(View.VISIBLE);
+        bottomBar.setVisibility(View.GONE);
     }
 }

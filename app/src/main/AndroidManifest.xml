@@ -53,10 +53,6 @@
             android:name=".CameraEscaneoActivity"
             android:exported="false" />
         <activity
-            android:name=".DetallesActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
             android:name=".CategoriasActivity"
             android:exported="false" />
         <activity

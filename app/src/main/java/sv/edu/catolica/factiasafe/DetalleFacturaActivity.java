@@ -303,8 +303,20 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         actionBorrar.setOnClickListener(v -> {
             FaSafeDB dbHelper = new FaSafeDB(this);
             SQLiteDatabase db = dbHelper.getWritableDatabase();
+            
+            // Borrar garantía
+            db.delete("warranties", "invoice_id = ?", new String[]{String.valueOf(invoiceId)});
+            
+            // Borrar items
+            db.delete("invoice_items", "invoice_id = ?", new String[]{String.valueOf(invoiceId)});
+            
+            // Borrar attachments
+            db.delete("attachments", "invoice_id = ?", new String[]{String.valueOf(invoiceId)});
+            
+            // Borrar factura
             int deleted = db.delete("invoices", "id = ?", new String[]{String.valueOf(invoiceId)});
             db.close();
+            
             if (deleted > 0) {
                 Toast.makeText(this, "Factura borrada", Toast.LENGTH_SHORT).show();
             } else {
