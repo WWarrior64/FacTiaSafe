@@ -31,6 +31,7 @@ public class CategoriasActivity extends AppCompatActivity {
     private CategoriaAdapter categoriaAdapter;
     private List<Categoria> categoriasList;
     private View layoutAddCategoria;
+    private CategoriaDAO categoriaDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,25 +55,17 @@ public class CategoriasActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-
-        cargarCategoriasDummy();
-
-
+        categoriaDAO = new CategoriaDAO(this);
+        cargarCategoriasDesdeDB();
         setupRecyclerView();
-
-
         setupListeners();
     }
 
-    private void cargarCategoriasDummy() {
-        categoriasList = new ArrayList<>();
-        // Puedes reemplazar los R.drawable con 0 si no tienes los iconos dummy aún
-        categoriasList.add(new Categoria("Servicios básicos", 0));
-        categoriasList.add(new Categoria("Supermercado", 0));
-        categoriasList.add(new Categoria("Transporte", 0));
-        categoriasList.add(new Categoria("Salud", 0));
-        categoriasList.add(new Categoria("Educación", 0));
-        categoriasList.add(new Categoria("Compras personales", 0));
+    /**
+     * Carga las categorías desde la base de datos
+     */
+    private void cargarCategoriasDesdeDB() {
+        categoriasList = new ArrayList<>(categoriaDAO.getAllCategorias());
     }
 
     private void setupRecyclerView() {
@@ -99,68 +92,131 @@ public class CategoriasActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        // Listener para el botón LISTO (Guardar y Salir)
-        buttonListo.setOnClickListener(v -> {
-            // Lógica final para guardar en SQLite
-            Toast.makeText(this, "Guardando " + categoriasList.size() + " categorías...", Toast.LENGTH_SHORT).show();
-            finish();
-        });
+        // Listener para el botón LISTO (Cerrar Activity)
+        buttonListo.setOnClickListener(v -> finish());
 
         // Listener para "Añadir nueva categoría"
         layoutAddCategoria.setOnClickListener(v -> mostrarDialogoAdicion());
     }
 
+    /**
+     * Elimina una categoría de la BD y la lista
+     * @param position Posición en la lista
+     */
     private void eliminarCategoria(final int position) {
-        String nombre = categoriasList.get(position).getNombre();
-        categoriasList.remove(position);
-        categoriaAdapter.notifyItemRemoved(position);
-        Toast.makeText(this, nombre + " eliminada.", Toast.LENGTH_SHORT).show();
-        // NOTA: Implementar aquí la lógica para eliminar de SQLite.
+        Categoria categoria = categoriasList.get(position);
+        String nombre = categoria.getNombre();
+
+        // Eliminar de BD
+        if (categoriaDAO.deleteCategoria(categoria.getId())) {
+            // Eliminar de la lista y notificar
+            categoriasList.remove(position);
+            categoriaAdapter.notifyItemRemoved(position);
+            Toast.makeText(this, nombre + " eliminada.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Error al eliminar categoría.", Toast.LENGTH_SHORT).show();
+        }
     }
 
+    /**
+     * Muestra diálogo para crear una nueva categoría
+     */
     private void mostrarDialogoAdicion() {
-        // Crea la vista para el diálogo (un EditText simple)
-        final EditText input = new EditText(this);
-        input.setHint("Ej: Vestimenta");
-        input.setPadding(50, 50, 50, 50); // Añade padding para mejor visualización
+        final EditText inputNombre = new EditText(this);
+        inputNombre.setHint("Ej: Vestimenta");
+        inputNombre.setPadding(50, 50, 50, 50);
+
+        final EditText inputDescripcion = new EditText(this);
+        inputDescripcion.setHint("Descripción (opcional)");
+        inputDescripcion.setPadding(50, 50, 50, 50);
+
+        // Crear un contenedor para ambos EditTexts
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.addView(inputNombre);
+        layout.addView(inputDescripcion);
 
         new AlertDialog.Builder(this)
                 .setTitle("Añadir Nueva Categoría")
-                .setView(input)
+                .setView(layout)
                 .setPositiveButton("Añadir", (dialog, which) -> {
-                    String nuevoNombre = input.getText().toString().trim();
-                    if (!nuevoNombre.isEmpty()) {
-                        Categoria nuevaCategoria = new Categoria(nuevoNombre, 0); // 0 es el icono placeholder
+                    String nuevoNombre = inputNombre.getText().toString().trim();
+                    String nuevaDescripcion = inputDescripcion.getText().toString().trim();
+
+                    if (nuevoNombre.isEmpty()) {
+                        Toast.makeText(this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Verificar que no exista otra categoría con ese nombre
+                    if (categoriaDAO.existsByName(nuevoNombre)) {
+                        Toast.makeText(this, "Ya existe una categoría con ese nombre.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Insertar en BD
+                    long id = categoriaDAO.insertCategoria(nuevoNombre, nuevaDescripcion);
+                    if (id != -1) {
+                        Categoria nuevaCategoria = new Categoria((int) id, nuevoNombre, nuevaDescripcion);
                         categoriasList.add(nuevaCategoria);
                         categoriaAdapter.notifyItemInserted(categoriasList.size() - 1);
                         Toast.makeText(this, nuevoNombre + " añadida.", Toast.LENGTH_SHORT).show();
-                        // NOTA: Implementar aquí la lógica para guardar en SQLite.
                     } else {
-                        Toast.makeText(this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Error al guardar la categoría.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
     }
 
+    /**
+     * Muestra diálogo para editar una categoría existente
+     * @param position Posición en la lista
+     */
     private void mostrarDialogoEdicion(final int position) {
         final Categoria categoriaAEditar = categoriasList.get(position);
-        final EditText input = new EditText(this);
-        input.setText(categoriaAEditar.getNombre());
-        input.setPadding(50, 50, 50, 50);
+
+        final EditText inputNombre = new EditText(this);
+        inputNombre.setText(categoriaAEditar.getNombre());
+        inputNombre.setPadding(50, 50, 50, 50);
+
+        final EditText inputDescripcion = new EditText(this);
+        inputDescripcion.setText(categoriaAEditar.getDescripcion());
+        inputDescripcion.setHint("Descripción (opcional)");
+        inputDescripcion.setPadding(50, 50, 50, 50);
+
+        // Crear un contenedor para ambos EditTexts
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.addView(inputNombre);
+        layout.addView(inputDescripcion);
 
         new AlertDialog.Builder(this)
                 .setTitle("Editar Categoría")
-                .setView(input)
+                .setView(layout)
                 .setPositiveButton("Guardar", (dialog, which) -> {
-                    String nuevoNombre = input.getText().toString().trim();
-                    if (!nuevoNombre.isEmpty()) {
+                    String nuevoNombre = inputNombre.getText().toString().trim();
+                    String nuevaDescripcion = inputDescripcion.getText().toString().trim();
+
+                    if (nuevoNombre.isEmpty()) {
+                        Toast.makeText(this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Verificar que no exista otra categoría con ese nombre (excepto la actual)
+                    if (categoriaDAO.existsByNameExcluding(nuevoNombre, categoriaAEditar.getId())) {
+                        Toast.makeText(this, "Ya existe otra categoría con ese nombre.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Actualizar en BD
+                    if (categoriaDAO.updateCategoria(categoriaAEditar.getId(), nuevoNombre, nuevaDescripcion)) {
                         categoriaAEditar.setNombre(nuevoNombre);
+                        categoriaAEditar.setDescripcion(nuevaDescripcion);
                         categoriaAdapter.notifyItemChanged(position);
                         Toast.makeText(this, "Categoría actualizada.", Toast.LENGTH_SHORT).show();
-                        // NOTA: Implementar aquí la lógica para actualizar en SQLite.
                     } else {
-                        Toast.makeText(this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Error al actualizar la categoría.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("Cancelar", null)
