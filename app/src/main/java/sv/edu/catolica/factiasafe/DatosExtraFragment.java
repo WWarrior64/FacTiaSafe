@@ -435,6 +435,25 @@ public class DatosExtraFragment extends Fragment {
                 new Object[]{ (storeId == -1) ? null : storeId, (categoryId == -1) ? null : categoryId, notes, TextUtils.isEmpty(productImagePath) ? null : productImagePath, invoiceId });
     }
 
+    /**
+     * Método público para guardar datos extra con un invoiceId específico.
+     * Se usa en EntradaManualActivity cuando se crea una nueva factura.
+     */
+    public void saveIntoDatabaseWithId(SQLiteDatabase db, int newInvoiceId) throws Exception {
+        if (newInvoiceId == -1 || db == null) return;
+
+        String storeName = getTienda();
+        String categoryName = getCategoria();
+        String notes = getNotas();
+
+        int storeId = getStoreIdByName(db, storeName);
+        int categoryId = getCategoryIdByName(db, categoryName);
+
+        // Actualizar solo las columnas relacionadas
+        db.execSQL("UPDATE invoices SET store_id = ?, category_id = ?, notes = ?, product_image_path = ? WHERE id = ?",
+                new Object[]{ (storeId == -1) ? null : storeId, (categoryId == -1) ? null : categoryId, notes, TextUtils.isEmpty(productImagePath) ? null : productImagePath, newInvoiceId });
+    }
+
     // Getters públicos
     public String getTienda() {
         return inputTiendaComercio != null && inputTiendaComercio.getEditText() != null

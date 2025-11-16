@@ -808,6 +808,39 @@ public class DatosPrincipalesFragment extends Fragment {
         }
     }
 
+    /**
+     * Método público para guardar items a la base de datos con un invoiceId específico.
+     * Se usa en EntradaManualActivity cuando se crea una nueva factura.
+     */
+    public void saveItemsToDatabase(SQLiteDatabase db, int newInvoiceId) throws Exception {
+        if (newInvoiceId == -1 || db == null) return;
+
+        String itemsText = inputItems != null && inputItems.getEditText() != null
+                ? inputItems.getEditText().getText().toString() : "";
+
+        String[] lines = itemsText.split("\\r?\\n");
+        for (String line : lines) {
+            if (TextUtils.isEmpty(line.trim())) continue;
+            String[] parts = line.split("\\s*;\\s*");
+            String desc = parts.length > 0 ? parts[0].trim() : "";
+            double qty = 0.0;
+            double unit = 0.0;
+            if (parts.length > 1) {
+                qty = safeParse(parts[1]);
+            }
+            if (parts.length > 2) {
+                unit = safeParse(parts[2]);
+            }
+
+            double lineTotal = round2(qty * unit);
+
+            db.execSQL(
+                    "INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, line_total) VALUES (?, ?, ?, ?, ?)",
+                    new Object[]{newInvoiceId, desc, qty, unit, lineTotal}
+            );
+        }
+    }
+
     abstract class SimpleTextWatcher implements TextWatcher {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
