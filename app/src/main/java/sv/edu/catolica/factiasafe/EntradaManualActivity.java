@@ -163,8 +163,8 @@ public class EntradaManualActivity extends AppCompatActivity {
                 invoiceValues.put("thumbnail_path", thumbnailPath);
             }
 
-            // Obtener store_id y category_id
-            int storeId = getStoreIdByName(db, tienda);
+            // Obtener o crear store_id y obtener category_id
+            int storeId = obtenerOCrearStore(db, tienda);
             int categoryId = getCategoryIdByName(db, categoria);
 
             if (storeId > 0) {
@@ -219,8 +219,10 @@ public class EntradaManualActivity extends AppCompatActivity {
         finish();
     }
 
-    private int getStoreIdByName(SQLiteDatabase db, String storeName) {
+    private int obtenerOCrearStore(SQLiteDatabase db, String storeName) {
         if (storeName == null || storeName.isEmpty()) return -1;
+
+        // Buscar store existente
         android.database.Cursor cursor = db.rawQuery("SELECT id FROM stores WHERE name = ? LIMIT 1", new String[]{storeName});
         if (cursor.moveToFirst()) {
             int storeId = cursor.getInt(0);
@@ -228,7 +230,12 @@ public class EntradaManualActivity extends AppCompatActivity {
             return storeId;
         }
         cursor.close();
-        return -1;
+
+        // Si no existe, crear uno nuevo
+        ContentValues storeValues = new ContentValues();
+        storeValues.put("name", storeName);
+        long newStoreId = db.insert("stores", null, storeValues);
+        return (int) newStoreId;
     }
 
     private int getCategoryIdByName(SQLiteDatabase db, String categoryName) {
