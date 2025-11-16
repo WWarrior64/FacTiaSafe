@@ -395,16 +395,20 @@ public class DetalleFacturaActivity extends AppCompatActivity {
     }
 
     private String generateInvoicePdf() {
-        FaSafeDB dbHelper = null;
-        SQLiteDatabase db = null;
-        PdfDocument pdf = null;
-        try {
-            dbHelper = new FaSafeDB(this);
-            db = dbHelper.getReadableDatabase();
-            // Leer settings relevantes
-            String settingPath = getSetting(db, "pdf_save_path"); // ej: "Documents/FactiaSafe/Facturas"
-            String includeImagesSetting = getSetting(db, "incluir_productos-tiendas"); // "true" o "false"
-            boolean includeImages = includeImagesSetting != null && (includeImagesSetting.equalsIgnoreCase("true") || includeImagesSetting.equals("1"));
+         FaSafeDB dbHelper = null;
+         SQLiteDatabase db = null;
+         PdfDocument pdf = null;
+         try {
+             dbHelper = new FaSafeDB(this);
+             db = dbHelper.getReadableDatabase();
+             
+             // Eliminar PDF anterior si existe
+             deletePreviousPdf(db, invoiceId);
+             
+             // Leer settings relevantes
+             String settingPath = getSetting(db, "pdf_save_path"); // ej: "Documents/FactiaSafe/Facturas"
+             String includeImagesSetting = getSetting(db, "incluir_productos-tiendas"); // "true" o "false"
+             boolean includeImages = includeImagesSetting != null && (includeImagesSetting.equalsIgnoreCase("true") || includeImagesSetting.equals("1"));
             // Releer datos invoice (igual que antes)
             Cursor c = db.rawQuery("SELECT * FROM invoices WHERE id = ?", new String[]{String.valueOf(invoiceId)});
             if (!c.moveToFirst()) {
@@ -1067,6 +1071,47 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         }
 
         return inSampleSize;
+    }
+
+    /**
+     * Elimina el archivo PDF anterior de una factura si existe en la base de datos.
+     */
+    private void deletePreviousPdf(SQLiteDatabase db, int invoiceId) {
+        try {
+            // Obtener la ruta del PDF anterior
+            Cursor cursor = db.rawQuery("SELECT pdf_path FROM invoices WHERE id = ?", new String[]{String.valueOf(invoiceId)});
+            if (cursor.moveToFirst()) {
+                String pdfPath = cursor.isNull(0) ? null : cursor.getString(0);
+                cursor.close();
+                
+                if (pdfPath != null && !pdfPath.isEmpty()) {
+                    // Si es una URI de MediaStore (Android Q+), intentar eliminarla
+                    if (pdfPath.startsWith("content://")) {
+                        try {
+                            Uri uri = Uri.parse(pdfPath);
+                            getContentResolver().delete(uri, null, null);
+                            Log.i(TAG, "PDF anterior eliminado (MediaStore): " + pdfPath);
+                        } catch (Exception e) {
+                            Log.w(TAG, "No se pudo eliminar PDF anterior por URI: " + e.getMessage());
+                        }
+                    } else {
+                        // Si es una ruta de archivo, eliminarla directamente
+                        File pdfFile = new File(pdfPath);
+                        if (pdfFile.exists()) {
+                            if (pdfFile.delete()) {
+                                Log.i(TAG, "PDF anterior eliminado: " + pdfPath);
+                            } else {
+                                Log.w(TAG, "No se pudo eliminar archivo PDF anterior: " + pdfPath);
+                            }
+                        }
+                    }
+                }
+            } else {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error eliminando PDF anterior", e);
+        }
     }
 
 }
