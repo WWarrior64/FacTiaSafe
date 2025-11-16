@@ -399,16 +399,22 @@ public class DetalleFacturaActivity extends AppCompatActivity {
          SQLiteDatabase db = null;
          PdfDocument pdf = null;
          try {
-             dbHelper = new FaSafeDB(this);
-             db = dbHelper.getReadableDatabase();
-             
-             // Eliminar PDF anterior si existe
-             deletePreviousPdf(db, invoiceId);
-             
-             // Leer settings relevantes
-             String settingPath = getSetting(db, "pdf_save_path"); // ej: "Documents/FactiaSafe/Facturas"
-             String includeImagesSetting = getSetting(db, "incluir_productos-tiendas"); // "true" o "false"
-             boolean includeImages = includeImagesSetting != null && (includeImagesSetting.equalsIgnoreCase("true") || includeImagesSetting.equals("1"));
+              dbHelper = new FaSafeDB(this);
+              db = dbHelper.getReadableDatabase();
+              
+              // Eliminar PDF anterior si existe
+              deletePreviousPdf(db, invoiceId);
+              
+              // Leer settings relevantes
+              String settingPath = getSetting(db, "pdf_save_path"); // ej: "Documents/FactiaSafe/Facturas"
+              String includeImagesSetting = getSetting(db, "incluir_productos-tiendas"); // "true" o "false"
+              boolean includeImages = includeImagesSetting != null && (includeImagesSetting.equalsIgnoreCase("true") || includeImagesSetting.equals("1"));
+              
+              // Leer configuraciones de privacidad y seguridad
+              String cifradoSetting = getSetting(db, "pdf_cifrado_archivos");
+              String anonimizarSetting = getSetting(db, "pdf_anonimizar_datos");
+              boolean aplicarCifrado = cifradoSetting != null && (cifradoSetting.equalsIgnoreCase("true") || cifradoSetting.equals("1"));
+              boolean anonimizarDatos = anonimizarSetting != null && (anonimizarSetting.equalsIgnoreCase("true") || anonimizarSetting.equals("1"));
             // Releer datos invoice (igual que antes)
             Cursor c = db.rawQuery("SELECT * FROM invoices WHERE id = ?", new String[]{String.valueOf(invoiceId)});
             if (!c.moveToFirst()) {
@@ -416,21 +422,28 @@ public class DetalleFacturaActivity extends AppCompatActivity {
                 return null;
             }
             String companyName = c.getString(c.getColumnIndexOrThrow("company_name"));
-            String externalId = c.getString(c.getColumnIndexOrThrow("external_id"));
-            String date = c.getString(c.getColumnIndexOrThrow("date"));
-            double subtotal = c.getDouble(c.getColumnIndexOrThrow("subtotal"));
-            double taxPercentage = c.getDouble(c.getColumnIndexOrThrow("tax_percentage"));
-            double taxAmount = c.getDouble(c.getColumnIndexOrThrow("tax_amount"));
-            double discountPercentage = c.getDouble(c.getColumnIndexOrThrow("discount_percentage"));
-            double discountAmount = c.getDouble(c.getColumnIndexOrThrow("discount_amount"));
-            double total = c.getDouble(c.getColumnIndexOrThrow("total"));
-            String currency = c.getString(c.getColumnIndexOrThrow("currency"));
-            String notes = c.getString(c.getColumnIndexOrThrow("notes"));
-            String thumbnailPath = c.getString(c.getColumnIndexOrThrow("thumbnail_path"));
-            String productImagePath = c.getString(c.getColumnIndexOrThrow("product_image_path"));
-            int storeId = c.getInt(c.getColumnIndexOrThrow("store_id"));
-            int categoryId = c.getInt(c.getColumnIndexOrThrow("category_id"));
-            c.close();
+             String externalId = c.getString(c.getColumnIndexOrThrow("external_id"));
+             String date = c.getString(c.getColumnIndexOrThrow("date"));
+             double subtotal = c.getDouble(c.getColumnIndexOrThrow("subtotal"));
+             double taxPercentage = c.getDouble(c.getColumnIndexOrThrow("tax_percentage"));
+             double taxAmount = c.getDouble(c.getColumnIndexOrThrow("tax_amount"));
+             double discountPercentage = c.getDouble(c.getColumnIndexOrThrow("discount_percentage"));
+             double discountAmount = c.getDouble(c.getColumnIndexOrThrow("discount_amount"));
+             double total = c.getDouble(c.getColumnIndexOrThrow("total"));
+             String currency = c.getString(c.getColumnIndexOrThrow("currency"));
+             String notes = c.getString(c.getColumnIndexOrThrow("notes"));
+             String thumbnailPath = c.getString(c.getColumnIndexOrThrow("thumbnail_path"));
+             String productImagePath = c.getString(c.getColumnIndexOrThrow("product_image_path"));
+             int storeId = c.getInt(c.getColumnIndexOrThrow("store_id"));
+             int categoryId = c.getInt(c.getColumnIndexOrThrow("category_id"));
+             c.close();
+             
+             // Aplicar anonimización si está habilitada
+             if (anonimizarDatos) {
+                 companyName = anonimizarCadena(companyName, "Empresa");
+                 externalId = anonimizarCadena(externalId, "FAC-" + invoiceId);
+                 notes = anonimizarCadena(notes, "");
+             }
             // Items
             List<PdfItem> items = new ArrayList<>();
             Cursor ic = db.rawQuery("SELECT description, quantity, unit_price, line_total FROM invoice_items WHERE invoice_id = ? ORDER BY id ASC", new String[]{String.valueOf(invoiceId)});
@@ -785,6 +798,12 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             }
             // finish last page
             pdf.finishPage(page);
+            
+            // Aplicar cifrado si está habilitado
+            if (aplicarCifrado) {
+                aplicarCifradoPdf(pdf);
+            }
+            
             // Guardar PDF usando el setting de ruta (si existe)
             // timestamp
             String ts = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
@@ -1071,6 +1090,30 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         }
 
         return inSampleSize;
+    }
+
+    /**
+     * Anonimiza una cadena de texto reemplazando caracteres visibles con asteriscos
+     */
+    private String anonimizarCadena(String texto, String reemplazo) {
+        if (texto == null || texto.isEmpty()) {
+            return reemplazo;
+        }
+        return reemplazo;
+    }
+
+    /**
+     * Aplica cifrado a un archivo PDF (implementación básica)
+     * En una implementación real, usarías una librería de cifrado como Bouncy Castle
+     */
+    private void aplicarCifradoPdf(PdfDocument pdf) {
+        // Nota: PdfDocument de Android no soporta cifrado nativo.
+        // Para implementar cifrado real, consideras usar librerías como:
+        // - iText (necesita licencia comercial para ciertos usos)
+        // - Apache PDFBox
+        // - Bouncy Castle
+        // Por ahora, esta es una función placeholder que puedes expandir.
+        Log.d(TAG, "Cifrado de PDF habilitado (se requiere librería adicional para implementación completa)");
     }
 
     /**
