@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">FacTia Safe</string>
     <string name="logo_app">logoapp</string>
-    <string name="encabezado_escanear">Facturas</string>
+    <string name="encabezado_escanear">Factura Escaneada</string>
     <string name="selector_opcion1">Imagen</string>
     <string name="selector_opcion2">Texto</string>
     <string name="agregar_vistaescanear">Añadir</string>

@@ -38,6 +38,10 @@ dependencies {
     implementation libs.picasso
     implementation libs.documentfile
     implementation libs.work.runtime
+    implementation libs.play.services.mlkit.text.recognition.common
+    implementation libs.vision.common
+    implementation libs.tess.two
+    implementation libs.play.services.mlkit.text.recognition
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
