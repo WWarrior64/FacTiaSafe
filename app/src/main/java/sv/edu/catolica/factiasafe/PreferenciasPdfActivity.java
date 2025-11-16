@@ -45,8 +45,7 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
 
     // Constante para el manejo de preferencias (usar tabla settings)
     private static final String SETTINGS_TABLE = "settings";
-    private static final String KEY_INCLUIR_PRODUCTOS = "incluir_productos";
-    private static final String KEY_INCLUIR_TIENDAS = "incluir_tiendas";
+    private static final String KEY_INCLUIR_PRODUCTOS = "incluir_productos-tiendas";
     private static final String KEY_PDF_PATH = "pdf_save_path";
 
     private FaSafeDB dbHelper;
@@ -141,14 +140,10 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
     private void cargarPreferencias() {
         // Lee las preferencias de la tabla settings (si existen), si no -> valores por defecto desde XML ya aplicados.
         String sProductos = getSetting(KEY_INCLUIR_PRODUCTOS);
-        String sTiendas = getSetting(KEY_INCLUIR_TIENDAS);
         String sRuta = getSetting(KEY_PDF_PATH);
 
         if (sProductos != null) {
             switchProductos.setChecked(Boolean.parseBoolean(sProductos));
-        }
-        if (sTiendas != null) {
-            switchTiendas.setChecked(Boolean.parseBoolean(sTiendas));
         }
         if (sRuta != null && !sRuta.isEmpty()) {
             // Mostrar ruta de forma amigable
@@ -172,10 +167,8 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
 
     private void guardarPreferencias() {
         boolean incluirProductos = switchProductos.isChecked();
-        boolean incluirTiendas = switchTiendas.isChecked();
 
         setSetting(KEY_INCLUIR_PRODUCTOS, String.valueOf(incluirProductos));
-        setSetting(KEY_INCLUIR_TIENDAS, String.valueOf(incluirTiendas));
 
         Toast.makeText(this, "Configuración guardada correctamente", Toast.LENGTH_SHORT).show();
         finish();

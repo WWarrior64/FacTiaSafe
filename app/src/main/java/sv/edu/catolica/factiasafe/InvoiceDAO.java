@@ -212,7 +212,7 @@ public class InvoiceDAO {
         if (o == null) return 0.0;
         if (o instanceof Number) return ((Number) o).doubleValue();
         try {
-            String s = String.valueOf(o).trim().replaceAll("[^0-9,\\-]", "");
+            String s = String.valueOf(o).trim().replaceAll("[^0-9,\\.\\-]", "");
             if (s.isEmpty()) return 0.0;
             if (s.contains(",") && s.contains(".")) {
                 if (s.matches(".*,[0-9]{2}$")) {

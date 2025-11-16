@@ -403,7 +403,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             db = dbHelper.getReadableDatabase();
             // Leer settings relevantes
             String settingPath = getSetting(db, "pdf_save_path"); // ej: "Documents/FactiaSafe/Facturas"
-            String includeImagesSetting = getSetting(db, "pdf_include_images"); // "true" o "false"
+            String includeImagesSetting = getSetting(db, "incluir_productos-tiendas"); // "true" o "false"
             boolean includeImages = includeImagesSetting != null && (includeImagesSetting.equalsIgnoreCase("true") || includeImagesSetting.equals("1"));
             // Releer datos invoice (igual que antes)
             Cursor c = db.rawQuery("SELECT * FROM invoices WHERE id = ?", new String[]{String.valueOf(invoiceId)});
@@ -638,7 +638,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
                 }
             }
             // --- IMÁGENES AL FINAL (si el setting lo permite) ---
-            if (includeImages && ( (thumbnailPath != null && !thumbnailPath.isEmpty()) || (productImagePath != null && !productImagePath.isEmpty()) )) {
+            if ( productImagePath != null && !productImagePath.isEmpty()) {
                 // asegurar espacio: si no hay, terminar la página y crear nueva
                 if (y > pageHeight - margin - 280) {
                     pdf.finishPage(page);
@@ -735,7 +735,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
                 }
 
                 // --- Product image ---
-                if (productImagePath != null && !productImagePath.isEmpty()) {
+                if (includeImages && ( productImagePath != null && !productImagePath.isEmpty())) {
                     try {
                         BitmapFactory.Options opts = new BitmapFactory.Options();
                         opts.inJustDecodeBounds = true;
