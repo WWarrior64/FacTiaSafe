@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -159,16 +160,42 @@ public class EscanearActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Preprocesa bitmap siguiendo recomendaciones de Google ML Kit v2:
+     * - Asegura suficiente resolución (texto >= 16x16 px, ideal 24x24)
+     * - Mejora contraste para OCR
+     * - Maneja rotación EXIF
+     */
     private Bitmap preprocessBitmap(Bitmap src) {
-        // Convertir a escala de grises + aumentar contraste + ligero sharpen/binarize
+        if (src == null) return null;
+        
         Bitmap bmp = src.copy(Bitmap.Config.ARGB_8888, true);
-        // ejemplo simple: incrementar brillo/contraste por pixel (no es OpenCV, pero ayuda)
-        float contrast = 1.4f; // Aumentado levemente para mejorar distinción de caracteres
-        float translate = -40f; // Más oscuro para mejorar contraste
+        
+        // 1) VALIDAR DIMENSIONES (Google: texto debe ser >= 16x16 px, mejor 24x24)
+        int minTextPixels = 16;
+        int avgCharWidth = bmp.getWidth() / 80;  // Asumir ~80 caracteres en ancho
+        if (avgCharWidth < minTextPixels) {
+            // Imagen muy pequeña, escalar (pero cuidado con límites de memoria)
+            Log.w(TAG, "Imagen muy pequeña para OCR (" + bmp.getWidth() + "x" + bmp.getHeight() + 
+                       "), escalando. Ancho/carácter: " + avgCharWidth + "px");
+            float scale = (float) minTextPixels / avgCharWidth;
+            // Limitar escala a máximo 2x para evitar artefactos
+            scale = Math.min(scale, 2.0f);
+            int newW = (int)(bmp.getWidth() * scale);
+            int newH = (int)(bmp.getHeight() * scale);
+            Bitmap scaled = Bitmap.createScaledBitmap(bmp, newW, newH, true);
+            if (scaled != bmp) bmp.recycle();
+            bmp = scaled;
+            Log.d(TAG, "Imagen escalada a: " + newW + "x" + newH);
+        }
+        
+        // 2) MEJORAR CONTRASTE (para mejor OCR)
+        float contrast = 1.4f;
+        float brightness = -40f;
         android.graphics.ColorMatrix cm = new android.graphics.ColorMatrix(new float[] {
-                contrast, 0, 0, 0, translate,
-                0, contrast, 0, 0, translate,
-                0, 0, contrast, 0, translate,
+                contrast, 0, 0, 0, brightness,
+                0, contrast, 0, 0, brightness,
+                0, 0, contrast, 0, brightness,
                 0, 0, 0, 1, 0
         });
         android.graphics.Paint paint = new android.graphics.Paint();
@@ -176,8 +203,82 @@ public class EscanearActivity extends AppCompatActivity {
         android.graphics.Bitmap result = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
         android.graphics.Canvas canvas = new android.graphics.Canvas(result);
         canvas.drawBitmap(bmp, 0, 0, paint);
-        Log.d(TAG, "Imagen preprocesada: contraste=" + contrast + ", translate=" + translate);
+        bmp.recycle();
+        
+        Log.d(TAG, "Imagen preprocesada: " + result.getWidth() + "x" + result.getHeight() + 
+                   " (contraste=" + contrast + ", brillo=" + brightness + ")");
         return result;
+    }
+    
+    /**
+     * Detecta rotación EXIF de la imagen (recomendado por Google ML Kit)
+     * Devuelve grados de rotación (0, 90, 180, 270)
+     */
+    private int getImageRotationDegrees(String imagePath) {
+        try {
+            if (imagePath == null) return 0;
+            String filePath = imagePath;
+            if (imagePath.startsWith("content://")) {
+                // Si es content URI, intentar convertir a ruta real (limitado)
+                return 0;
+            }
+            if (imagePath.startsWith("file://")) {
+                filePath = imagePath.substring(7);
+            }
+            ExifInterface exif = new ExifInterface(filePath);
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return 90;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return 180;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return 270;
+                default:
+                    return 0;
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "No se pudo leer rotación EXIF: " + e.getMessage());
+            return 0;
+        }
+    }
+    
+    /**
+     * Rota un bitmap según grados (0, 90, 180, 270)
+     */
+    private Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+        if (bitmap == null || degrees == 0) return bitmap;
+        
+        android.graphics.Matrix matrix = new android.graphics.Matrix();
+        matrix.postRotate(degrees);
+        Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        if (rotated != bitmap) bitmap.recycle();
+        return rotated;
+    }
+
+    /**
+     * Calcula el tamaño óptimo de imagen para OCR según Google ML Kit v2:
+     * - Mínimo: texto 16x16 px (40-80 caracteres x línea)
+     * - Óptimo: texto 24x24 px (mejor precisión)
+     * - Máximo: para limitar memoria y latencia
+     * Para facturas típicas (ancho ~200mm), a 96 DPI: ~750 píxeles.
+     */
+    private int calculateOptimalMaxDimension(int origWidth, int origHeight) {
+        // Google recomienda para documentos: 720x1280 píxeles mínimo
+        // Para facturas en tiempo real, podemos usar hasta 1600 para precisión
+        int maxDim = 1400;  // Balance entre precisión y latencia
+        
+        // Si imagen es pequeña (< 640), mantener
+        if (origWidth < 640 || origHeight < 640) {
+            maxDim = 800;  // Menor dimensión para acelerar
+        }
+        // Si imagen es muy grande, reducir más
+        else if (origWidth > 2000 || origHeight > 2000) {
+            maxDim = 1600;  // Máximo para no sobrecargar
+        }
+        
+        Log.d(TAG, "Dimensión máxima calculada: " + maxDim + "px (original: " + origWidth + "x" + origHeight + ")");
+        return maxDim;
     }
 
     private void procesarOCR(String photoPath) {
@@ -195,8 +296,9 @@ public class EscanearActivity extends AppCompatActivity {
                     inputStream.close();
                     inputStream = null;
                 }
-                // elegir tamaño máximo (ajusta si quieres más/menos)
-                final int maxDim = 1600;
+                
+                // Google ML Kit v2: calcular máximo óptimo según dimensiones
+                int maxDim = calculateOptimalMaxDimension(opts.outWidth, opts.outHeight);
                 int sampleSize = 1;
                 int w = opts.outWidth;
                 int h = opts.outHeight;
@@ -216,8 +318,16 @@ public class EscanearActivity extends AppCompatActivity {
                     } catch (Exception ignored) {}
                 }
             }
-            // 3) Si tenemos bitmap, aplicar tu preprocesado y crear InputImage
+            // 3) Si tenemos bitmap, aplicar rotación EXIF, preprocesado y crear InputImage
             if (bitmap != null) {
+                // 3.1) Detectar y aplicar rotación EXIF (Google ML Kit v2 recomienda esto)
+                int rotationDegrees = getImageRotationDegrees(photoPath);
+                if (rotationDegrees > 0) {
+                    Log.d(TAG, "Rotación EXIF detectada: " + rotationDegrees + " grados");
+                    bitmap = rotateBitmap(bitmap, rotationDegrees);
+                }
+                
+                // 3.2) Preprocesar (escalado y contraste)
                 Bitmap processed = preprocessBitmap(bitmap);
                 // si preprocess devuelve nuevo bitmap, reciclar el original para liberar memoria
                 if (processed != bitmap) {
@@ -225,7 +335,9 @@ public class EscanearActivity extends AppCompatActivity {
                         bitmap.recycle();
                     } catch (Exception ignored) {}
                 }
-                // crear InputImage usando el bitmap preprocesado
+                
+                // 3.3) Crear InputImage usando el bitmap preprocesado
+                // NOTA: Google ML Kit v2 maneja rotación vía el parámetro, aquí usamos 0 porque ya rotamos
                 InputImage image = InputImage.fromBitmap(processed, 0);
                 // --- continuar con recognizer.process(image) como ya lo tienes ---
                 TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
@@ -234,7 +346,19 @@ public class EscanearActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Text visionText) {
                                  textoOcrCrudo = visionText.getText(); // texto crudo
-                                 Log.d(TAG, "Texto OCR (crudo): " + textoOcrCrudo);
+                                  
+                                  // VALIDACIÓN GOOGLE ML KIT V2: Verificar calidad de resultado
+                                  if (textoOcrCrudo == null || textoOcrCrudo.trim().isEmpty()) {
+                                      Log.w(TAG, "⚠ OCR devolvió texto vacío. Posibles causas: " +
+                                              "imagen muy pequeña, baja resolución, ángulo incorrecto");
+                                      Toast.makeText(EscanearActivity.this,
+                                          "OCR no detectó texto. Intenta con mejor iluminación o acerca la cámara.",
+                                          Toast.LENGTH_LONG).show();
+                                      return;
+                                  }
+                                  
+                                  Log.d(TAG, "Texto OCR (crudo, " + textoOcrCrudo.length() + " chars): " + 
+                                       (textoOcrCrudo.length() > 500 ? textoOcrCrudo.substring(0, 500) + "..." : textoOcrCrudo));
                                  
                                  // ============ FLUJO MEJORADO Y REORGANIZADO DE EXTRACCIÓN ============
                                  Log.d(TAG, "===== INICIO EXTRACCIÓN FACTURA =====");
@@ -304,16 +428,37 @@ public class EscanearActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Calcula confianza promedio de los elementos de texto (Google ML Kit v2)
+     * También registra estadísticas detalladas por nivel (bloque, línea, elemento)
+     */
     private float averageConfidence(Text visionText) {
-        float sum = 0; int count = 0;
+        float sum = 0;
+        int elementCount = 0;
+        int blockCount = 0;
+        int lineCount = 0;
+        
         for (Text.TextBlock block : visionText.getTextBlocks()) {
+            blockCount++;
             for (Text.Line line : block.getLines()) {
+                lineCount++;
                 for (Text.Element el : line.getElements()) {
-                    try { sum += el.getConfidence(); count++; } catch (Exception ignored) {}
+                    try {
+                        float conf = el.getConfidence();
+                        sum += conf;
+                        elementCount++;
+                    } catch (Exception ignored) {
+                        // Si elemento no tiene confianza, ignorar
+                    }
                 }
             }
         }
-        return count > 0 ? sum / count : 0;
+        
+        float avgConfidence = elementCount > 0 ? sum / elementCount : 0;
+        Log.d(TAG, "OCR Statistics (ML Kit v2): " + blockCount + " bloques, " + 
+                   lineCount + " líneas, " + elementCount + " elementos. " +
+                   "Confianza promedio: " + String.format("%.1f%%", avgConfidence * 100));
+        return avgConfidence;
     }
 
     // ==================== TOKEN / PARSE HELPERS (con soporte a correcciones) ====================
@@ -397,18 +542,32 @@ public class EscanearActivity extends AppCompatActivity {
             Log.d(TAG, "Columna de precios detectada en X=" + priceColumnX + " (" + priceXs.size() + " precios)");
         }
         
-        // ============ AGRUPACIÓN DE FILAS CON TOLERANCIA ADAPTATIVA MEJORADA ============
+        // ============ AGRUPACIÓN DE FILAS CON TOLERANCIA ADAPTATIVA MEJORADA (ML KIT V2) ============
         tokens.sort((a,b)->Float.compare(a.centerY, b.centerY));
         ArrayList<ArrayList<TokenInfo>> rows = new ArrayList<>();
         
         // Calcular altura promedio de tokens para adaptar tolerancia
         float avgHeight = 0;
+        float minHeight = Float.MAX_VALUE;
+        float maxHeight = 0;
         for (TokenInfo t : tokens) {
-            avgHeight += t.box.height();
+            float h = t.box.height();
+            avgHeight += h;
+            minHeight = Math.min(minHeight, h);
+            maxHeight = Math.max(maxHeight, h);
         }
         avgHeight = tokens.isEmpty() ? 20 : avgHeight / tokens.size();
-        float yTol = Math.max(20f, avgHeight * 0.8f);  // 80% de altura promedio
-        Log.d(TAG, "Tolerancia Y adaptativa: " + yTol + "px (altura prom: " + avgHeight + "px)");
+        minHeight = minHeight == Float.MAX_VALUE ? 20 : minHeight;
+        
+        // Tolerancia más inteligente: considerar variabilidad de alturas
+        // En facturas pueden haber filas con alturas variables (líneas simples vs líneas dobles)
+        float yTol = Math.max(minHeight * 1.2f, avgHeight * 0.6f);
+        // Pero no menos de 15px para no fragmentar filas
+        yTol = Math.max(15f, Math.min(yTol, 40f));
+        
+        Log.d(TAG, "Agrupación de filas (ML Kit v2): altura prom=" + String.format("%.1f", avgHeight) + 
+                   "px, min=" + String.format("%.1f", minHeight) + "px, max=" + String.format("%.1f", maxHeight) + 
+                   "px, tolerancia Y=" + String.format("%.1f", yTol) + "px. Total tokens: " + tokens.size());
         
         for (TokenInfo e : tokens) {
             if (rows.isEmpty()) {
@@ -434,11 +593,21 @@ public class EscanearActivity extends AppCompatActivity {
                 }
             }
         }
-        // ============ PATRONES MEJORADOS PARA DETECTAR PRECIOS Y FOOTERS ============
+        // ============ PATRONES MEJORADOS PARA DETECTAR PRECIOS Y FOOTERS (ML KIT V2) ============
         Pattern strictPrice = Pattern.compile("^[\\$]?([0-9]+(?:[\\.,][0-9]{3})*(?:[\\.,][0-9]{2}))$");
-        Pattern footerPattern = Pattern.compile("(?i).*(sumas|subtotal|total(?:\\s+venta)?|ventas\\s+gravadas|ventas\\s+no\\s+sujetas|vtas\\.?\\s+exentas|autorizaci(o|ó)n|resoluci[oó]n|firma|recibido\\s+por|firma\\s+cajera|duplicado|nrc|nit|registro|serie|factura|tasa|por pagar|pago|pague|observacion|nota|aclaraci|descuento|dscto).*");
+        
+        // Footer pattern: líneas que son definitivamente NO productos (encabezados, totales, firmas)
+        // Más conservador para NO filtrar filas válidas de productos
+        Pattern footerPattern = Pattern.compile("(?i).*(^\\s*(sumas|subtotal|total|TOTAL(?:\\s+VENTA)?|ventas\\s+gravadas|" +
+                "ventas\\s+no\\s+sujetas|vtas\\.?\\s+exentas|autorizaci(o|ó)n|resoluci[oó]n|firma|recibido\\s+por|" +
+                "firma\\s+cajera|duplicado|nrc|nit|registro|serie(?:\\s+\\d+)?|tasa|por\\s+pagar|observacion|" +
+                "nota|aclaraci|condicion|pago|pague|descuento|dscto|iva|retencion|retención)\\b.*)");
+        
         Pattern subtotalPattern = Pattern.compile("(?i).*\\b(subtotal|sub[- ]?total|sumas|importe|monto)\\b.*");
         Pattern potentialQtyPattern = Pattern.compile("^(\\d+(?:[.,]\\d+)?)$");
+        
+        // DEBUG: Log para ver filtrado
+        int footerFilteredCount = 0;
         
         // Log de depuración: mostrar cuántas filas se detectaron
         Log.d(TAG, "Procesando " + rows.size() + " filas detectadas");
@@ -451,9 +620,17 @@ public class EscanearActivity extends AppCompatActivity {
             for (TokenInfo e : row) tokensText.add(e.text.trim());
             String rowText = String.join(" ", tokensText).trim();
             if (rowText.length() < 2) continue;
+            
+            // Filtro de footer MEJORADO: más estricto para no perder productos
             if (footerPattern.matcher(rowText).matches()) {
-                Log.d(TAG, "Fila omitida (footer): " + rowText);
+                Log.d(TAG, "Fila omitida (footer): \"" + rowText + "\"");
+                footerFilteredCount++;
                 continue;
+            }
+            
+            // Log detallado para DEBUG (mostrar primeras 100 caracteres)
+            if (rowIdx < 20) {  // Solo primeras 20 filas
+                Log.d(TAG, "Fila " + rowIdx + ": \"" + (rowText.length() > 80 ? rowText.substring(0, 80) + "..." : rowText) + "\"");
             }
             
             // 1) Si tenemos priceColumnX, buscar el elemento más cercano a esa X en la fila
@@ -622,8 +799,21 @@ public class EscanearActivity extends AppCompatActivity {
                 res.items.add(item);
                 res.subtotal += qty * price;
                 
-                Log.d(TAG, "Item extraído: " + desc + " x" + qty + " @ $" + String.format(Locale.US, "%.2f", price));
+                Log.d(TAG, "Item extraído [" + res.items.size() + "]: " + desc + 
+                       " | qty=" + String.format("%.2f", qty) + " | precio=$" + 
+                       String.format(Locale.US, "%.2f", price));
         }
+        
+        // RESUMEN FINAL DE EXTRACCIÓN (ML KIT V2)
+        Log.d(TAG, "╔═══════════════════════════════════════════════════════");
+        Log.d(TAG, "║ RESUMEN parseItemsFromBlocks (ML Kit v2)");
+        Log.d(TAG, "║ Filas procesadas: " + rows.size() + " | Footers filtrados: " + footerFilteredCount);
+        Log.d(TAG, "║ Items extraídos: " + res.items.size());
+        Log.d(TAG, "║ Subtotal calculado: $" + String.format(Locale.US, "%.2f", res.subtotal));
+        Log.d(TAG, "║ Precios detectados: " + priceXs.size() + " | Columna X: " + 
+               String.format("%.0f", priceColumnX));
+        Log.d(TAG, "╚═══════════════════════════════════════════════════════");
+        
         return res;
     }
 
