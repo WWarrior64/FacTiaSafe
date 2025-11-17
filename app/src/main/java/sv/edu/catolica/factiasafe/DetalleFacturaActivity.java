@@ -1127,64 +1127,100 @@ public class DetalleFacturaActivity extends AppCompatActivity {
     private void procesarPdfConCifrado(String pdfPath) {
         if (pdfPath == null || pdfPath.isEmpty()) return;
 
+        String password = null;
+        // Obtener contraseña desde la BD (tu lógica original)
         try {
             FaSafeDB dbHelper = new FaSafeDB(this);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-            // Obtener contraseña de settings
-            String password = getSetting(db, "pdf_cifrado_password");
+            password = getSetting(db, "pdf_cifrado_password");
             db.close();
             dbHelper.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Error obteniendo contraseña de settings", e);
+        }
 
-            if (password == null || password.isEmpty()) {
-                Log.w(TAG, "No hay contraseña configurada para cifrado");
-                return;
-            }
+        Log.d(TAG, "Contraseña obtenida: [" + (password != null ? password : "null") + "]");
 
-            // Si es una URI de MediaStore (Android Q+), usar un archivo temporal
-            File tempFile = null;
-            File sourceFile = null;
+        if (password == null || password.isEmpty()) {
+            Log.w(TAG, "No hay contraseña configurada para cifrado - No se cifra el PDF");
+            return;
+        }
 
-            if (pdfPath.startsWith("content://")) {
-                // Copiar desde MediaStore a archivo temporal
-                tempFile = new File(getCacheDir(), "temp_encrypt_" + System.currentTimeMillis() + ".pdf");
-                try (InputStream is = getContentResolver().openInputStream(Uri.parse(pdfPath));
-                     FileOutputStream fos = new FileOutputStream(tempFile)) {
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    while ((bytesRead = is.read(buffer)) != -1) {
-                        fos.write(buffer, 0, bytesRead);
-                    }
+        // Caso URI (Android Q+)
+        if (pdfPath.startsWith("content://")) {
+            Uri pdfUri = Uri.parse(pdfPath);
+            java.io.ByteArrayOutputStream outputBaos = null;
+            try (InputStream is = getContentResolver().openInputStream(pdfUri);
+                 java.io.ByteArrayOutputStream inputBaos = new java.io.ByteArrayOutputStream()) {
+
+                if (is == null) {
+                    Log.e(TAG, "No se pudo abrir InputStream para la URI");
+                    return;
                 }
-                sourceFile = tempFile;
-            } else {
-                sourceFile = new File(pdfPath);
+
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    inputBaos.write(buffer, 0, bytesRead);
+                }
+                byte[] pdfBytes = inputBaos.toByteArray();
+
+                // Cifrar en memoria con iText7
+                outputBaos = new java.io.ByteArrayOutputStream();
+                com.itextpdf.kernel.pdf.WriterProperties writerProps = new com.itextpdf.kernel.pdf.WriterProperties()
+                        .setStandardEncryption(password.getBytes(), password.getBytes(), 0,
+                                com.itextpdf.kernel.pdf.EncryptionConstants.ENCRYPTION_AES_256);
+
+                com.itextpdf.kernel.pdf.PdfReader reader = new com.itextpdf.kernel.pdf.PdfReader(new java.io.ByteArrayInputStream(pdfBytes));
+                com.itextpdf.kernel.pdf.PdfWriter writer = new com.itextpdf.kernel.pdf.PdfWriter(outputBaos, writerProps);
+
+                com.itextpdf.kernel.pdf.PdfDocument pdfDoc = new com.itextpdf.kernel.pdf.PdfDocument(reader, writer);
+                pdfDoc.close(); // Esto escribe el PDF cifrado en outputBaos
+
+                // Escribir el contenido cifrado de vuelta a la URI (sobrescribe)
+                try (OutputStream os = getContentResolver().openOutputStream(pdfUri)) {
+                    if (os != null) {
+                        os.write(outputBaos.toByteArray());
+                        os.flush();
+                        Log.i(TAG, "PDF cifrado correctamente (URI)");
+                    } else {
+                        Log.e(TAG, "No se pudo abrir OutputStream para la URI");
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error escribiendo PDF cifrado a la URI", e);
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, "iText7 encryption error (URI): " + e.getMessage(), e);
+            } finally {
+                if (outputBaos != null) {
+                    try { outputBaos.close(); } catch (Exception ignored) {}
+                }
             }
 
+        } else {
+            // Caso ruta de archivo (rutas convencionales)
+            File sourceFile = new File(pdfPath);
             if (!sourceFile.exists()) {
                 Log.e(TAG, "Archivo PDF no existe: " + sourceFile.getAbsolutePath());
                 return;
             }
 
-            // Crear archivo temporal cifrado
             File encryptedFile = new File(sourceFile.getParent(), sourceFile.getName() + ".enc");
-
-            // Usar iText7 para cifrar
             try {
-                PdfReader reader = new PdfReader(sourceFile.getAbsolutePath());
-                WriterProperties writerProps = new WriterProperties()
-                        .setStandardEncryption(password.getBytes(), password.getBytes(),
-                                EncryptionConstants.ALLOW_PRINTING | EncryptionConstants.ALLOW_COPY,
-                                EncryptionConstants.ENCRYPTION_AES_256);
+                com.itextpdf.kernel.pdf.PdfReader reader = new com.itextpdf.kernel.pdf.PdfReader(sourceFile.getAbsolutePath());
+                com.itextpdf.kernel.pdf.WriterProperties writerProps = new com.itextpdf.kernel.pdf.WriterProperties()
+                        .setStandardEncryption(password.getBytes(), password.getBytes(), 0,
+                                com.itextpdf.kernel.pdf.EncryptionConstants.ENCRYPTION_AES_256);
 
-                PdfWriter writer = new PdfWriter(encryptedFile.getAbsolutePath(), writerProps);
+                com.itextpdf.kernel.pdf.PdfWriter writer = new com.itextpdf.kernel.pdf.PdfWriter(encryptedFile.getAbsolutePath(), writerProps);
                 com.itextpdf.kernel.pdf.PdfDocument pdfDoc = new com.itextpdf.kernel.pdf.PdfDocument(reader, writer);
                 pdfDoc.close();
 
                 // Reemplazar archivo original con versión cifrada
                 if (sourceFile.delete()) {
                     if (encryptedFile.renameTo(sourceFile)) {
-                        Log.i(TAG, "PDF cifrado correctamente con iText7");
+                        Log.i(TAG, "PDF cifrado correctamente con iText7 (archivo)");
                     } else {
                         Log.e(TAG, "Error al renombrar archivo cifrado");
                     }
@@ -1192,20 +1228,16 @@ public class DetalleFacturaActivity extends AppCompatActivity {
                     Log.e(TAG, "Error al eliminar archivo original");
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error durante cifrado con iText7", e);
-                // Limpiar archivo temporal si existe
-                if (encryptedFile.exists()) encryptedFile.delete();
-            } finally {
-                // Limpiar archivo temporal
-                if (tempFile != null && tempFile.exists()) {
-                    tempFile.delete();
+                Log.e(TAG, "Error durante cifrado con iText7 (archivo)", e);
+                if (encryptedFile.exists()) {
+                    if (!encryptedFile.delete()) {
+                        Log.w(TAG, "No se pudo borrar el archivo temporal cifrado");
+                    }
                 }
             }
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error procesando PDF con cifrado", e);
         }
     }
+
 
     /**
      * Elimina el archivo PDF anterior de una factura si existe en la base de datos.

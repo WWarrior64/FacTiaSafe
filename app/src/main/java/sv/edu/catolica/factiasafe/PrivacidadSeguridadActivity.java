@@ -56,6 +56,13 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
         switchCifradoArchivos.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 mostrarDialogoCifrado();
+            } else {
+                // Si se desactiva, borrar la contraseña guardada
+                FaSafeDB dbHelper = new FaSafeDB(this);
+                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                guardarSetting(db, SETTING_CIFRADO_PASSWORD, "");
+                db.close();
+                dbHelper.close();
             }
         });
 
@@ -164,7 +171,20 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
         com.google.android.material.textfield.TextInputEditText etConfirmPassword = dialogView.findViewById(R.id.et_confirm_password);
 
         btnCancelar.setOnClickListener(v -> {
+            // Desactivar switch sin guardar
+            switchCifradoArchivos.setOnCheckedChangeListener(null);
             switchCifradoArchivos.setChecked(false);
+            switchCifradoArchivos.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    mostrarDialogoCifrado();
+                } else {
+                    FaSafeDB dbHelper = new FaSafeDB(PrivacidadSeguridadActivity.this);
+                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                    guardarSetting(db, SETTING_CIFRADO_PASSWORD, "");
+                    db.close();
+                    dbHelper.close();
+                }
+            });
             dialog.dismiss();
         });
 
@@ -189,7 +209,7 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
             db.close();
             dbHelper.close();
 
-            Toast.makeText(PrivacidadSeguridadActivity.this, "Contraseña configurada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PrivacidadSeguridadActivity.this, "Cifrado activado con contraseña", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
         dialog.show();
