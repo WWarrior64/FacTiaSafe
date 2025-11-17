@@ -64,7 +64,7 @@ public class EscanearActivity extends AppCompatActivity {
     private final int FRAGMENT_CONTAINER_ID = R.id.contenedor_fragment;
     private String fragmentTagActual = "IMAGEN_TAG";
     private View bottomBar;
-    private LinearLayout opcionEditar, opcionDetalles;
+    private LinearLayout opcionTomarDeNuevo;
     private static final String TAG = "EscanearActivity";
     private String imagenEscaneadaPath = null;
     private ActivityResultLauncher<Intent> scannerLauncher;
@@ -100,9 +100,9 @@ public class EscanearActivity extends AppCompatActivity {
         fragmentTextoContainer = findViewById(R.id.fragment_texto_container);
         bottomBar = findViewById(R.id.barra_navegacion_inferior);
 
-        opcionEditar = findViewById(R.id.opcion_editar);
-        opcionDetalles = findViewById(R.id.opcion_detalles);
-        opcionEditar.setOnClickListener(v -> abrirEditorImagen());
+        opcionTomarDeNuevo = findViewById(R.id.opcion_recargar);
+
+        opcionTomarDeNuevo.setOnClickListener(v -> abrirEditorImagen());
     }
 
     @Override
@@ -1784,11 +1784,8 @@ public class EscanearActivity extends AppCompatActivity {
     }
 
     private void abrirEditorImagen() {
-        Intent intent = new Intent(this, OpcionEditarActivity.class);
-        if (imagenEscaneadaPath != null) {
-            intent.putExtra("photo_paths", imagenEscaneadaPath);
-        }
-        startActivity(intent);
+        Intent intent = new Intent(this, CameraEscaneoActivity.class);
+        scannerLauncher.launch(intent);
     }
 
     public void lanzarEscaner() {

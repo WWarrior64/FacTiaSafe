@@ -662,7 +662,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
                 }
             }
             // --- IMÁGENES AL FINAL (si el setting lo permite) ---
-            if ( productImagePath != null && !productImagePath.isEmpty()) {
+            if ((thumbnailPath != null && !thumbnailPath.isEmpty()) ||(productImagePath != null && !productImagePath.isEmpty())) {
                 // asegurar espacio: si no hay, terminar la página y crear nueva
                 if (y > pageHeight - margin - 280) {
                     pdf.finishPage(page);

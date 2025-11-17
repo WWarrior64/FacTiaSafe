@@ -59,9 +59,6 @@
             android:name=".NotificacionesActivity"
             android:exported="false" />
         <activity
-            android:name=".OpcionEditarActivity"
-            android:exported="false" />
-        <activity
             android:name=".PrivacidadSeguridadActivity"
             android:exported="false" />
         <activity

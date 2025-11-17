@@ -23,7 +23,7 @@
     <string name="fecha_inicio_editarfactura">Fecha inicio</string>
     <string name="fecha_fin_editarfactura">Fecha fin</string>
     <string name="editar_editarfactura">Editar</string>
-    <string name="pdf_editarfactura">PDF</string>
+    <string name="escanear_otra_factura">Escanear Otra Vez</string>
     <string name="detalles_editarfactura">Detalles</string>
     <string name="encabezado_ajustes">Ajustes</string>
     <string name="notificacion_ajustes">Este es un icono de notificaciones</string>
