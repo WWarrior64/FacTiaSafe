@@ -28,6 +28,7 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
     // Keys para la tabla settings
     private static final String SETTING_CIFRADO_ARCHIVOS = "pdf_cifrado_archivos";
     private static final String SETTING_ANONIMIZAR_DATOS = "pdf_anonimizar_datos";
+    private static final String SETTING_CIFRADO_PASSWORD = "pdf_cifrado_password";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,13 +160,38 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
 
         Button btnCancelar = dialogView.findViewById(R.id.btn_cancelar);
         Button btnActivar = dialogView.findViewById(R.id.btn_activar);
+        com.google.android.material.textfield.TextInputEditText etPassword = dialogView.findViewById(R.id.et_password);
+        com.google.android.material.textfield.TextInputEditText etConfirmPassword = dialogView.findViewById(R.id.et_confirm_password);
 
         btnCancelar.setOnClickListener(v -> {
             switchCifradoArchivos.setChecked(false);
             dialog.dismiss();
         });
 
-        btnActivar.setOnClickListener(v -> dialog.dismiss());
+        btnActivar.setOnClickListener(v -> {
+            String password = etPassword.getText().toString().trim();
+            String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+            if (password.isEmpty()) {
+                Toast.makeText(PrivacidadSeguridadActivity.this, "Ingresa una contraseña", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                Toast.makeText(PrivacidadSeguridadActivity.this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Guardar contraseña en settings
+            FaSafeDB dbHelper = new FaSafeDB(PrivacidadSeguridadActivity.this);
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            guardarSetting(db, SETTING_CIFRADO_PASSWORD, password);
+            db.close();
+            dbHelper.close();
+
+            Toast.makeText(PrivacidadSeguridadActivity.this, "Contraseña configurada", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
         dialog.show();
     }
 }

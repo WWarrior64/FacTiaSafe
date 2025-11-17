@@ -42,6 +42,9 @@ dependencies {
     implementation libs.vision.common
     implementation libs.tess.two
     implementation libs.play.services.mlkit.text.recognition
+    implementation 'com.itextpdf.android:kernel-android:9.2.0'
+    implementation 'com.itextpdf.android:io-android:9.2.0'
+    implementation 'com.itextpdf.android:bouncy-castle-adapter-android:9.2.0'
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
