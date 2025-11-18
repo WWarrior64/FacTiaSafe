@@ -47,15 +47,15 @@ public class PdfFolderUtils {
                 if (!targetDir.exists()) {
                     boolean ok = targetDir.mkdirs();
                     if (!ok) {
-                        Toast.makeText(activity, "Error al crear carpeta pública", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, R.string.error_carpeta_publica, Toast.LENGTH_SHORT).show();
                         return;
                     }
                 }
                 String pathStr = targetDir.getAbsolutePath();
                 setSetting(dbHelper, KEY_PDF_PATH, pathStr);
-                Toast.makeText(activity, "Carpeta pública creada automáticamente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, R.string.carpeta_creada, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                Toast.makeText(activity, "Error al crear carpeta pública: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.error_carpeta_publica) + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         } else {
             String relativePath = Environment.DIRECTORY_DOCUMENTS + "/FactiaSafe/Facturas";
@@ -73,18 +73,18 @@ public class PdfFolderUtils {
                     try (OutputStream os = resolver.openOutputStream(dummyUri)) {
                         // Escribir vacío
                     } catch (Exception e) {
-                        Toast.makeText(activity, "Error al escribir archivo dummy: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(activity, activity.getString(R.string.error_escribir_archivo) + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                     // Opcional: resolver.delete(dummyUri, null, null);
                 } else {
-                    Toast.makeText(activity, "Error al insertar en MediaStore", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, R.string.error_mediastore, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 setSetting(dbHelper, KEY_PDF_PATH, relativePath);
-                Toast.makeText(activity, "Carpeta pública creada automáticamente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, R.string.carpeta_creada, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
-                Toast.makeText(activity, "Error al crear carpeta con MediaStore: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getString(R.string.error_mediastore2) + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }

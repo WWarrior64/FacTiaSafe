@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorOnPrimary"
-            app:title="Categorías"
+            app:title="@string/categorias"
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:titleTextColor="?attr/colorOnSecondary" />
 
@@ -61,7 +61,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Gestión de categorías"
+                        android:text="@string/gestion_cat"
                         android:textColor="?attr/colorOnSecondary"
                         android:textSize="16sp"
                         android:textStyle="bold"/>
@@ -69,7 +69,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Selecciono el icono '=' para editar la categoría o pulse '⊖' para eliminar"
+                        android:text="@string/instrucciones_cat"
                         android:textColor="?attr/colorOnSecondaryFixed"
                         android:textSize="14sp"/>
 
@@ -117,7 +117,7 @@
                         android:id="@+id/icon_add"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:contentDescription="Añadir"
+                        android:contentDescription="@string/anadir"
                         android:src="@drawable/ic_add_circle"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -128,7 +128,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Añadir nueva categoría"
+                        android:text="@string/nueva_categoria"
                         android:textColor="?attr/colorOnSecondary"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -152,7 +152,7 @@
         android:layout_marginBottom="24dp"
         android:paddingTop="14dp"
         android:paddingBottom="14dp"
-        android:text="LISTO"
+        android:text="@string/listo2"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="bold"

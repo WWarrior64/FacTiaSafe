@@ -28,7 +28,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/logo_factia_safe"
             android:background="?attr/colorOnTertiary"
-            android:contentDescription="Vista previa de factura"
+            android:contentDescription="@string/vista_previa"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

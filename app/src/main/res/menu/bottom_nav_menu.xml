@@ -3,13 +3,13 @@
     <item
         android:id="@+id/navigation_facturas"
         android:icon="@drawable/ic_invoice"
-        android:title="Facturas" />
+        android:title="@string/encabezado_editarfactura" />
     <item
         android:id="@+id/navigation_garantias"
         android:icon="@drawable/ic_guarantee"
-        android:title="Garantías" />
+        android:title="@string/garantias" />
     <item
         android:id="@+id/navigation_ajustes"
         android:icon="@drawable/ic_settings"
-        android:title="Ajustes" />
+        android:title="@string/encabezado_ajustes" />
 </menu>

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -403,8 +404,8 @@ public class EscanearActivity extends AppCompatActivity {
                                  float avgConf = averageConfidence(visionText);
                                  // Toast siempre: advertir que OCR no es exacto
                                  Toast.makeText(EscanearActivity.this, 
-                                     "OCR completado (confianza: " + String.format("%.0f", avgConf*100) + "%). " +
-                                     "⚠ El OCR no es 100% exacto. Revisa y edita los datos antes de guardar.", 
+                                     getString(R.string.ocr_completado_confianza) + String.format("%.0f", avgConf*100) + "%). " +
+                                     getString(R.string.revisa_datos),
                                      Toast.LENGTH_LONG).show();
                                  Log.d(TAG, "OCR completado. Confianza promedio: " + String.format("%.0f", avgConf*100) + "%");
                                  // --- Tesseract DESHABILITADO ---
@@ -536,13 +537,17 @@ public class EscanearActivity extends AppCompatActivity {
         // Elegir columna de precios por mediana X (más robusto que promedio)
         float priceColumnX = -1f;
         if (!priceXs.isEmpty()) {
-            priceXs.sort(Float::compare);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                priceXs.sort(Float::compare);
+            }
             priceColumnX = priceXs.get(priceXs.size() / 2);
             Log.d(TAG, "Columna de precios detectada en X=" + priceColumnX + " (" + priceXs.size() + " precios)");
         }
         
         // ============ AGRUPACIÓN DE FILAS CON TOLERANCIA ADAPTATIVA MEJORADA (ML KIT V2) ============
-        tokens.sort((a,b)->Float.compare(a.centerY, b.centerY));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tokens.sort((a,b)->Float.compare(a.centerY, b.centerY));
+        }
         ArrayList<ArrayList<TokenInfo>> rows = new ArrayList<>();
         
         // Calcular altura promedio de tokens para adaptar tolerancia
@@ -614,7 +619,9 @@ public class EscanearActivity extends AppCompatActivity {
         // Para cada fila: ordenar por X y detectar precio usando columna si existe
         for (int rowIdx = 0; rowIdx < rows.size(); rowIdx++) {
             ArrayList<TokenInfo> row = rows.get(rowIdx);
-            row.sort((a,b)->Float.compare(a.centerX, b.centerX));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                row.sort((a,b)->Float.compare(a.centerX, b.centerX));
+            }
             ArrayList<String> tokensText = new ArrayList<>();
             for (TokenInfo e : row) tokensText.add(e.text.trim());
             String rowText = String.join(" ", tokensText).trim();
@@ -833,9 +840,15 @@ public class EscanearActivity extends AppCompatActivity {
             boolean likelyPrice = corrAmount > 5; // precios típicamente > 5
             
             for (HashMap<String,String> item : items) {
-                double itemPrice = parseAmountLenient(item.getOrDefault("precio", "0"));
-                double itemQty = parseAmountLenient(item.getOrDefault("cantidad", "1"));
-                
+                double itemPrice = 0;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    itemPrice = parseAmountLenient(item.getOrDefault("precio", "0"));
+                }
+                double itemQty = 0;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    itemQty = parseAmountLenient(item.getOrDefault("cantidad", "1"));
+                }
+
                 if (likelyPrice && Math.abs(itemPrice - parseAmountLenient(tkn.text)) < 0.01) {
                     // Coincide con el precio del item
                     item.put("precio", String.format(Locale.US, "%.2f", corrAmount));
@@ -881,10 +894,14 @@ public class EscanearActivity extends AppCompatActivity {
         }
         float priceColumnX = -1f;
         if (!priceXs.isEmpty()) {
-            priceXs.sort(Float::compare);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                priceXs.sort(Float::compare);
+            }
             priceColumnX = priceXs.get(priceXs.size()/2);
         }
-        tokens.sort((a,b)->Float.compare(a.centerY, b.centerY));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            tokens.sort((a,b)->Float.compare(a.centerY, b.centerY));
+        }
         ArrayList<ArrayList<TokenInfo>> rows = new ArrayList<>();
         float yTol = 30f;
         for (TokenInfo e : tokens) {
@@ -902,7 +919,9 @@ public class EscanearActivity extends AppCompatActivity {
         Pattern strictPrice = Pattern.compile("^[\\$]?([0-9]+(?:[\\.,][0-9]{3})*(?:[\\.,][0-9]{2}))$");
         Pattern footerPattern = Pattern.compile("(?i).*\\b(sumas|subtotal|total venta|ventas gravadas|ventas no sujetas|vtas\\.? exentas|autorizaci(o|ó)n|resoluci[oó]n|firma|recibido por|firma cajera|duplicado|nrc|nit|registro|serie|factura)\\b.*");
         for (ArrayList<TokenInfo> row : rows) {
-            row.sort((a,b)->Float.compare(a.centerX, b.centerX));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                row.sort((a,b)->Float.compare(a.centerX, b.centerX));
+            }
             ArrayList<String> tokensText = new ArrayList<>();
             for (TokenInfo ti : row) tokensText.add(ti.text.trim());
             String rowText = String.join(" ", tokensText).trim();
@@ -1475,7 +1494,10 @@ public class EscanearActivity extends AppCompatActivity {
         // Patrón 2: códigos alfanuméricos sin vocales (ej: SKU123, PRC4567)
         if (token.matches("^[A-Z0-9]{4,}$") && token.matches(".*\\d.*")) {
             // Contar vocales
-            long vowels = token.toLowerCase().chars().filter(c -> "aeiou".indexOf(c) >= 0).count();
+            long vowels = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                vowels = token.toLowerCase().chars().filter(c -> "aeiou".indexOf(c) >= 0).count();
+            }
             if (vowels <= token.length() / 3) return true;
         }
         

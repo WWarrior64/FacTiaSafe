@@ -103,9 +103,9 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
             // Guardar anonimizar datos
             guardarSetting(db, SETTING_ANONIMIZAR_DATOS, switchAnonimizarDatos.isChecked() ? "true" : "false");
 
-            Toast.makeText(this, "Configuración guardada correctamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.conf_guardada_correct, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
-            Toast.makeText(this, "Error al guardar la configuración", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_al_guardar_conf, Toast.LENGTH_SHORT).show();
         } finally {
             db.close();
             dbHelper.close();
@@ -193,12 +193,12 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
             String confirmPassword = etConfirmPassword.getText().toString().trim();
 
             if (password.isEmpty()) {
-                Toast.makeText(PrivacidadSeguridadActivity.this, "Ingresa una contraseña", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PrivacidadSeguridadActivity.this, R.string.ingresa_contrasena, Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (!password.equals(confirmPassword)) {
-                Toast.makeText(PrivacidadSeguridadActivity.this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PrivacidadSeguridadActivity.this, R.string.contrasenas_no_coinciden, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -209,7 +209,7 @@ public class PrivacidadSeguridadActivity extends AppCompatActivity {
             db.close();
             dbHelper.close();
 
-            Toast.makeText(PrivacidadSeguridadActivity.this, "Cifrado activado con contraseña", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PrivacidadSeguridadActivity.this, R.string.cifrado_activado, Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
         dialog.show();

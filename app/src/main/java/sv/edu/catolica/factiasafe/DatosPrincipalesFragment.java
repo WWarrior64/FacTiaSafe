@@ -109,7 +109,7 @@ public class DatosPrincipalesFragment extends Fragment {
                                 loadThumbnailIntoView(savedPath);
                             }
                         } catch (Exception e) {
-                            Log.e(TAG, "Error guardando imagen: " + e.getMessage(), e);
+                            Log.e(TAG, e.getMessage(), e);
                         }
                     }
                 }
@@ -485,7 +485,7 @@ public class DatosPrincipalesFragment extends Fragment {
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "loadThumbnailIntoView error: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
     }
 
@@ -513,7 +513,7 @@ public class DatosPrincipalesFragment extends Fragment {
             is.close();
             return outFile.getAbsolutePath();
         } catch (Exception e) {
-            Log.e(TAG, "copyUriToInternalStorage error: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
             return "";
         }
     }

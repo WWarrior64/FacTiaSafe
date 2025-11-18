@@ -83,7 +83,7 @@ public class EntradaManualActivity extends AppCompatActivity {
 
     private void saveNewInvoice() {
         if (pagerAdapter == null) {
-            Toast.makeText(this, "Error interno: adapter no inicializado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_adapter, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -109,7 +109,7 @@ public class EntradaManualActivity extends AppCompatActivity {
         }
 
         if (!(f0 instanceof DatosPrincipalesFragment)) {
-            Toast.makeText(this, "No se encontró DatosPrincipalesFragment", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_encontrado_principal, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -176,7 +176,7 @@ public class EntradaManualActivity extends AppCompatActivity {
 
             long invoiceId = db.insert("invoices", null, invoiceValues);
             if (invoiceId == -1) {
-                throw new Exception("Error al insertar factura");
+                throw new Exception(getString(R.string.error_al_insertar_factura));
             }
 
             // Guardar items
@@ -194,10 +194,10 @@ public class EntradaManualActivity extends AppCompatActivity {
             }
 
             db.setTransactionSuccessful();
-            Toast.makeText(this, "Factura creada exitosamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.fact_creada_exito, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
-            Toast.makeText(this, "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.error_al_guardar) + e.getMessage(), Toast.LENGTH_LONG).show();
             Log.e("EntradaManualActivity", "Error saving invoice", e);
         } finally {
             try { db.endTransaction(); } catch (Exception ignored) {}

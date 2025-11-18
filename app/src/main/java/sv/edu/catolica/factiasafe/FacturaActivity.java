@@ -55,7 +55,7 @@ public class FacturaActivity extends BaseActivity {
         });
 
         // Configuración de la Toolbar (métodos heredados)
-        setToolbarTitle("Facturas");
+        setToolbarTitle(getString(R.string.encabezado_editarfactura));
         showUpButton(false);
 
         // Inicializa vistas del contenido (que ahora están en activity_factura_content.xml)

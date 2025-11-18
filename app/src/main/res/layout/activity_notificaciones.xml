@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorOnPrimary"
-            app:title="Notificaciones y Recordatorios"
+            app:title="@string/notificaciones_ajustes2"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:titleTextColor="?attr/colorOnSecondary"/>
 
@@ -61,7 +61,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tiempo de antelación y alertas"
+                        android:text="@string/tiempo_antelacion"
                         android:textColor="?attr/colorOnSecondary"
                         android:textSize="16sp"
                         android:textStyle="bold"/>
@@ -69,7 +69,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Establece el tiempo para recibir alertas de aquellas facturas que están por vencer"
+                        android:text="@string/instrucc_antelacion"
                         android:textColor="?attr/colorOnSecondaryFixed"
                         android:textSize="14sp"
                         android:layout_marginBottom="16dp"/>
@@ -89,7 +89,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="none"
-                            android:text="3 días"
+                            android:text="@string/tres_dias"
                             android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,7 +108,7 @@
         android:layout_marginBottom="24dp"
         android:paddingTop="14dp"
         android:paddingBottom="14dp"
-        android:text="GUARDAR CONFIGURACIÓN"
+        android:text="@string/guardar_conf"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="bold"

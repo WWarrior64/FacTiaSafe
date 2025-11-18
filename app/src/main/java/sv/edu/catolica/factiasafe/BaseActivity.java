@@ -64,8 +64,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (contentFrame != null) {
             getLayoutInflater().inflate(layoutResId, contentFrame, true);
         } else {
-            // Esto indica un problema de inicialización en activity_base.xml o en onCreate().
-            Log.e("BaseActivity", "contentFrame es nulo. No se puede inflar el layout.");
+
         }
     }
 

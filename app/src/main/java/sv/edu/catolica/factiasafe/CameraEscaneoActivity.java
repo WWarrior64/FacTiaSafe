@@ -40,7 +40,7 @@ public class CameraEscaneoActivity extends AppCompatActivity {
                         }
                     }
                 } else {
-                    Toast.makeText(this, "Escaneo cancelado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.escaneo_cancelado, Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });
@@ -81,8 +81,8 @@ public class CameraEscaneoActivity extends AppCompatActivity {
                     scannerLauncher.launch(request);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error al iniciar escáner: " + e.getMessage(), e);
-                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e(TAG, getString(R.string.error_escaneo) + e.getMessage(), e);
+                    Toast.makeText(this, getString(R.string.error2_escaneo) + e.getMessage(), Toast.LENGTH_LONG).show();
                     finish();
                 });
     }
@@ -116,10 +116,10 @@ public class CameraEscaneoActivity extends AppCompatActivity {
             setResult(RESULT_OK, resultIntent);
 
 
-            Toast.makeText(this, "Factura escaneada exitosamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.escaneo_exito, Toast.LENGTH_SHORT).show();
         } else {
 
-            Toast.makeText(this, "No se encontró la factura escaneada", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.escaneo_fallo, Toast.LENGTH_LONG).show();
         }
 
         finish();

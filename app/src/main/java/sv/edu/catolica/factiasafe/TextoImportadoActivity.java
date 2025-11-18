@@ -1,5 +1,6 @@
 package sv.edu.catolica.factiasafe;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -53,9 +54,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** @noinspection NonAsciiCharacters, TryFinallyCanBeTryWithResources , CallToPrintStackTrace */
 public class TextoImportadoActivity extends AppCompatActivity {
 
     private TextInputEditText editEmpresa, editFactura, editFecha, editTienda;
@@ -195,14 +198,14 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
                 productBitmap = bitmap;
 
-                Toast.makeText(this, "Imagen de producto agregada", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.imagen_producto_agregada, Toast.LENGTH_SHORT).show();
             }
 
             if (inputStream != null) {
                 inputStream.close();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Error al cargar la imagen", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_cargar_imagen, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -263,7 +266,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
                 Bitmap imagenProducto = null;
 
                 // Asignar según el orden de aparición
-                if (todasLasImagenes.size() >= 1) {
+                if (!todasLasImagenes.isEmpty()) {
                     imagenFactura = todasLasImagenes.get(0); // Primera imagen = Factura
                 }
                 if (todasLasImagenes.size() >= 2) {
@@ -303,7 +306,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
                     if (todasLasImagenes.size() == 1) {
                         Toast.makeText(TextoImportadoActivity.this,
-                                "Se encontró solo la imagen de factura",
+                                R.string.solo_imgfactura,
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -316,7 +319,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
                     imageProductThumbnail.setVisibility(View.GONE);
                     photoPlaceholderOverlay.setVisibility(View.VISIBLE);
                     Toast.makeText(TextoImportadoActivity.this,
-                            "Error al cargar las imágenes del PDF",
+                            R.string.error_imgpdf,
                             Toast.LENGTH_SHORT).show();
                 });
             } finally {
@@ -324,7 +327,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
                     if (document != null) {
                         document.close();
                     }
-                } catch (IOException e) {
+                } catch (IOException ignored) {
 
                 }
             }
@@ -490,7 +493,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
                 calcularTotales();
             } catch (Exception e) {
 
-                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.error2_escaneo) + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -532,12 +535,12 @@ public class TextoImportadoActivity extends AppCompatActivity {
         int dia = calendario.get(Calendar.DAY_OF_MONTH);
 
 
-        String fechaActual = editText.getText().toString();
+        String fechaActual = Objects.requireNonNull(editText.getText()).toString();
         if (!TextUtils.isEmpty(fechaActual)) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 Calendar fechaExistente = Calendar.getInstance();
-                fechaExistente.setTime(sdf.parse(fechaActual));
+                fechaExistente.setTime(Objects.requireNonNull(sdf.parse(fechaActual)));
                 año = fechaExistente.get(Calendar.YEAR);
                 mes = fechaExistente.get(Calendar.MONTH);
                 dia = fechaExistente.get(Calendar.DAY_OF_MONTH);
@@ -574,7 +577,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
     private void calcularFechaFinGarantia(int startYear, int startMonth, int startDay) {
         try {
-            String mesesStr = editGarantiaMeses.getText().toString();
+            String mesesStr = Objects.requireNonNull(editGarantiaMeses.getText()).toString();
             if (!TextUtils.isEmpty(mesesStr)) {
                 int meses = Integer.parseInt(mesesStr);
                 Calendar calendario = Calendar.getInstance();
@@ -588,20 +591,20 @@ public class TextoImportadoActivity extends AppCompatActivity {
                         calendario.get(Calendar.DAY_OF_MONTH));
                 editGarantiaEnd.setText(fechaFin);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
 
         }
     }
 
     private void calcularFechaFinDesdeMeses() {
         try {
-            String fechaInicioStr = editGarantiaStart.getText().toString();
-            String mesesStr = editGarantiaMeses.getText().toString();
+            String fechaInicioStr = Objects.requireNonNull(editGarantiaStart.getText()).toString();
+            String mesesStr = Objects.requireNonNull(editGarantiaMeses.getText()).toString();
 
             if (!TextUtils.isEmpty(fechaInicioStr) && !TextUtils.isEmpty(mesesStr)) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 Calendar calendario = Calendar.getInstance();
-                calendario.setTime(sdf.parse(fechaInicioStr));
+                calendario.setTime(Objects.requireNonNull(sdf.parse(fechaInicioStr)));
 
                 int meses = Integer.parseInt(mesesStr);
                 calendario.add(Calendar.MONTH, meses);
@@ -613,24 +616,24 @@ public class TextoImportadoActivity extends AppCompatActivity {
                         calendario.get(Calendar.DAY_OF_MONTH));
                 editGarantiaEnd.setText(fechaFin);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
 
     private void calcularMesesGarantia() {
         try {
-            String fechaInicioStr = editGarantiaStart.getText().toString();
-            String fechaFinStr = editGarantiaEnd.getText().toString();
+            String fechaInicioStr = Objects.requireNonNull(editGarantiaStart.getText()).toString();
+            String fechaFinStr = Objects.requireNonNull(editGarantiaEnd.getText()).toString();
 
             if (!TextUtils.isEmpty(fechaInicioStr) && !TextUtils.isEmpty(fechaFinStr)) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
                 Calendar inicio = Calendar.getInstance();
-                inicio.setTime(sdf.parse(fechaInicioStr));
+                inicio.setTime(Objects.requireNonNull(sdf.parse(fechaInicioStr)));
 
                 Calendar fin = Calendar.getInstance();
-                fin.setTime(sdf.parse(fechaFinStr));
+                fin.setTime(Objects.requireNonNull(sdf.parse(fechaFinStr)));
 
                 // Calcular diferencia en meses
                 int meses = calcularDiferenciaMeses(inicio, fin);
@@ -639,7 +642,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
                     editGarantiaMeses.setText(String.valueOf(meses));
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -763,7 +766,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Pattern p = Pattern.compile("Factura:\\s*(\\w+\\d+)", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(texto);
         if (m.find()) {
-            return m.group(1).trim();
+            return Objects.requireNonNull(m.group(1)).trim();
         }
         return null;
     }
@@ -773,7 +776,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Pattern p = Pattern.compile("Fecha:\\s*(\\d{4}-\\d{2}-\\d{2})", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(texto);
         if (m.find()) {
-            return m.group(1).trim();
+            return Objects.requireNonNull(m.group(1)).trim();
         }
         return null;
     }
@@ -783,7 +786,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Pattern p = Pattern.compile("Tienda:\\s*(.+?)(?=\\n|$)", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(texto);
         if (m.find()) {
-            return m.group(1).trim();
+            return Objects.requireNonNull(m.group(1)).trim();
         }
         return null;
     }
@@ -814,9 +817,9 @@ public class TextoImportadoActivity extends AppCompatActivity {
             if (enSeccionItems && !linea.isEmpty()) {
                 Matcher m = itemPattern.matcher(linea);
                 if (m.find()) {
-                    String descripcion = m.group(1).trim();
-                    String cantidad = m.group(2).trim();
-                    String precio = m.group(3).trim().replace("$", "");
+                    String descripcion = Objects.requireNonNull(m.group(1)).trim();
+                    String cantidad = Objects.requireNonNull(m.group(2)).trim();
+                    String precio = Objects.requireNonNull(m.group(3)).trim().replace("$", "");
 
                     itemsBuilder.append(descripcion)
                             .append(" ; ")
@@ -838,9 +841,6 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
 
         Double total = extraerMontoEspecifico(texto, "Total:");
-        if (total != null) {
-
-        }
 
         calcularTotales();
     }
@@ -851,14 +851,15 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Matcher m = p.matcher(texto);
         if (m.find()) {
             try {
-                return Double.parseDouble(m.group(1));
-            } catch (NumberFormatException e) {
+                return Double.parseDouble(Objects.requireNonNull(m.group(1)));
+            } catch (NumberFormatException ignored) {
 
             }
         }
         return null;
     }
 
+    @SuppressLint("DefaultLocale")
     private void extraerImpuesto(String texto) {
         if (cambioManualImpuesto) return;
 
@@ -867,12 +868,12 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Matcher mPorcentaje = pPorcentaje.matcher(texto);
         if (mPorcentaje.find()) {
             try {
-                double porcentaje = Double.parseDouble(mPorcentaje.group(1));
+                double porcentaje = Double.parseDouble(Objects.requireNonNull(mPorcentaje.group(1)));
                 editPorcentajeImpuesto.setText(String.format("%.2f", porcentaje));
 
                 calcularMontoImpuestoDesdePorcentaje();
 
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
 
             }
         }
@@ -880,6 +881,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
     }
 
+    @SuppressLint("DefaultLocale")
     private void extraerDescuento(String texto) {
         if (cambioManualDescuento) return;
 
@@ -888,23 +890,24 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Matcher mPorcentaje = pPorcentaje.matcher(texto);
         if (mPorcentaje.find()) {
             try {
-                double porcentaje = Double.parseDouble(mPorcentaje.group(1));
+                double porcentaje = Double.parseDouble(Objects.requireNonNull(mPorcentaje.group(1)));
                 editPorcentajeDescuento.setText(String.format("%.2f", porcentaje));
 
 
                 calcularMontoDescuentoDesdePorcentaje();
 
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
 
             }
         }
 
     }
 
+    @SuppressLint("DefaultLocale")
     private void calcularMontoImpuestoDesdePorcentaje() {
         try {
 
-            String porcentajeStr = editPorcentajeImpuesto.getText().toString().trim();
+            String porcentajeStr = Objects.requireNonNull(editPorcentajeImpuesto.getText()).toString().trim();
             if (porcentajeStr.isEmpty()) {
                 editCantidadImpuesto.setText("");
                 return;
@@ -924,13 +927,14 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
 
         } catch (Exception e) {
-
+            throw new RuntimeException(e);
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void calcularMontoDescuentoDesdePorcentaje() {
         try {
-            String porcentajeStr = editPorcentajeDescuento.getText().toString().trim();
+            String porcentajeStr = Objects.requireNonNull(editPorcentajeDescuento.getText()).toString().trim();
             if (porcentajeStr.isEmpty()) {
                 editCantidadDescuento.setText("");
                 return;
@@ -949,17 +953,18 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
 
 
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void calcularPorcentajeImpuestoDesdeMonto() {
         try {
 
             double subtotal = calcularSubtotalDesdeItems();
 
-            String montoStr = editCantidadImpuesto.getText().toString();
+            String montoStr = Objects.requireNonNull(editCantidadImpuesto.getText()).toString();
             if (montoStr.isEmpty()) return;
 
             double monto = Double.parseDouble(montoStr);
@@ -968,17 +973,18 @@ public class TextoImportadoActivity extends AppCompatActivity {
                 double porcentaje = (monto / subtotal) * 100.0;
                 editPorcentajeImpuesto.setText(String.format("%.2f", porcentaje));
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void calcularPorcentajeDescuentoDesdeMonto() {
         try {
 
             double subtotal = calcularSubtotalDesdeItems();
 
-            String montoStr = editCantidadDescuento.getText().toString();
+            String montoStr = Objects.requireNonNull(editCantidadDescuento.getText()).toString();
             if (montoStr.isEmpty()) return;
 
             double monto = Double.parseDouble(montoStr);
@@ -987,7 +993,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
                 double porcentaje = (monto / subtotal) * 100.0;
                 editPorcentajeDescuento.setText(String.format("%.2f", porcentaje));
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -1031,21 +1037,21 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Pattern pInicio = Pattern.compile("Inicio:\\s*(\\d{4}-\\d{2}-\\d{2})", Pattern.CASE_INSENSITIVE);
         Matcher mInicio = pInicio.matcher(texto);
         if (mInicio.find()) {
-            editGarantiaStart.setText(mInicio.group(1).trim());
+            editGarantiaStart.setText(Objects.requireNonNull(mInicio.group(1)).trim());
         }
 
         // Extraer fecha de fin
         Pattern pFin = Pattern.compile("Fin:\\s*(\\d{4}-\\d{2}-\\d{2})", Pattern.CASE_INSENSITIVE);
         Matcher mFin = pFin.matcher(texto);
         if (mFin.find()) {
-            editGarantiaEnd.setText(mFin.group(1).trim());
+            editGarantiaEnd.setText(Objects.requireNonNull(mFin.group(1)).trim());
         }
 
         // Extraer meses
         Pattern pMeses = Pattern.compile("Meses:\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
         Matcher mMeses = pMeses.matcher(texto);
         if (mMeses.find()) {
-            editGarantiaMeses.setText(mMeses.group(1).trim());
+            editGarantiaMeses.setText(Objects.requireNonNull(mMeses.group(1)).trim());
         }
     }
 
@@ -1053,11 +1059,12 @@ public class TextoImportadoActivity extends AppCompatActivity {
         Pattern p = Pattern.compile("Notas:?\\s*(.+?)(?=\\s*Attachments|\\n\\n|$)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
         Matcher m = p.matcher(texto);
         if (m.find()) {
-            return m.group(1).trim();
+            return Objects.requireNonNull(m.group(1)).trim();
         }
         return null;
     }
 
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     private void calcularTotales() {
         try {
 
@@ -1069,7 +1076,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
 
             if (switchImpuesto.isChecked()) {
-                String impuestoText = editCantidadImpuesto.getText().toString().trim();
+                String impuestoText = Objects.requireNonNull(editCantidadImpuesto.getText()).toString().trim();
 
                 if (!impuestoText.isEmpty()) {
                     try {
@@ -1086,7 +1093,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
             }
 
             // Calcular descuento
-            String descuentoText = editCantidadDescuento.getText().toString().trim();
+            String descuentoText = Objects.requireNonNull(editCantidadDescuento.getText()).toString().trim();
             Log.d("DEBUG", "Texto descuento: '" + descuentoText + "'");
             if (!descuentoText.isEmpty()) {
                 try {
@@ -1128,14 +1135,14 @@ public class TextoImportadoActivity extends AppCompatActivity {
             }
 
 
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
 
     private double calcularSubtotalDesdeItems() {
         try {
-            String itemsText = editItems.getText().toString().trim();
+            String itemsText = Objects.requireNonNull(editItems.getText()).toString().trim();
             if (TextUtils.isEmpty(itemsText)) {
                 return 0.0;
             }
@@ -1159,7 +1166,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
                             subtotal += cantidad * precio;
                         }
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException ignored) {
 
                     }
                 }
@@ -1174,37 +1181,113 @@ public class TextoImportadoActivity extends AppCompatActivity {
     }
 
     private void guardarFactura() {
-        // Validar campos obligatorios (sin cambios)
+        // Validar campos obligatorios básicos
         if (TextUtils.isEmpty(editEmpresa.getText())) {
-            Toast.makeText(this, "El nombre de la empresa es obligatorio", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.nombre_empresa_obligatorio, Toast.LENGTH_SHORT).show();
+            editEmpresa.requestFocus();
             return;
         }
 
         if (TextUtils.isEmpty(editFecha.getText())) {
-            Toast.makeText(this, "La fecha es obligatoria", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.fecha_obligatoria, Toast.LENGTH_SHORT).show();
+            editFecha.requestFocus();
             return;
         }
 
-        // Recolectar datos de los campos actuales (sin cambios)
-        String companyName = editEmpresa.getText().toString().trim();
-        String externalId = editFactura.getText().toString().trim();
-        String date = editFecha.getText().toString().trim();
-        String tienda = editTienda.getText().toString().trim();
-        String categoria = autoCompleteCategoria.getText().toString().trim();
-        String notas = editDatosExtras.getText().toString().trim();
 
-        // Obtener montos numéricos y garantía (sin cambios)
+        // Validar garantía: si se llena un campo, deben llenarse todos
+        String warrantyStart = editGarantiaStart != null && editGarantiaStart.getText() != null ?
+                editGarantiaStart.getText().toString().trim() : "";
+        String warrantyEnd = editGarantiaEnd != null && editGarantiaEnd.getText() != null ?
+                editGarantiaEnd.getText().toString().trim() : "";
+        String warrantyMonthsStr = editGarantiaMeses != null && editGarantiaMeses.getText() != null ?
+                editGarantiaMeses.getText().toString().trim() : "";
+
+        boolean hasAnyWarranty = !warrantyStart.isEmpty() || !warrantyEnd.isEmpty() || !warrantyMonthsStr.isEmpty();
+        boolean hasCompleteWarranty = !warrantyStart.isEmpty() && !warrantyEnd.isEmpty();
+
+        if (hasAnyWarranty && !hasCompleteWarranty) {
+            Toast.makeText(this, R.string.instrucc_fechagarantia, Toast.LENGTH_LONG).show();
+            if (warrantyStart.isEmpty()) {
+                editGarantiaStart.requestFocus();
+            } else {
+                editGarantiaEnd.requestFocus();
+            }
+            return;
+        }
+
+        // Validar que la fecha de fin de garantía sea posterior a la de inicio
+        if (hasCompleteWarranty) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                Date startDate = sdf.parse(warrantyStart);
+                Date endDate = sdf.parse(warrantyEnd);
+
+                if (startDate != null && endDate != null && endDate.before(startDate)) {
+                    Toast.makeText(this, R.string.instrucc2_fechagarantia, Toast.LENGTH_LONG).show();
+                    editGarantiaEnd.requestFocus();
+                    return;
+                }
+            } catch (ParseException e) {
+                Toast.makeText(this, R.string.formato_fechagarantia, Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        // Recolectar datos de los campos actuales
+        String companyName = editEmpresa.getText().toString().trim();
+        String externalId = editFactura != null && editFactura.getText() != null ?
+                editFactura.getText().toString().trim() : "";
+        String date = editFecha.getText().toString().trim();
+        String tienda = editTienda != null && editTienda.getText() != null ?
+                editTienda.getText().toString().trim() : "";
+        String categoria = autoCompleteCategoria != null ?
+                autoCompleteCategoria.getText().toString().trim() : "";
+        String notas = editDatosExtras != null && editDatosExtras.getText() != null ?
+                editDatosExtras.getText().toString().trim() : "";
+
+        // Obtener montos numéricos con manejo seguro
         double subtotal = obtenerSubtotalNumerico();
-        double taxPct = obtenerValorNumerico(editPorcentajeImpuesto.getText().toString());
-        double taxAmount = obtenerValorNumerico(editCantidadImpuesto.getText().toString());
-        double discountPct = obtenerValorNumerico(editPorcentajeDescuento.getText().toString());
-        double discountAmount = obtenerValorNumerico(editCantidadDescuento.getText().toString());
+        double taxPct = 0.0;
+        double taxAmount = 0.0;
+        double discountPct = 0.0;
+        double discountAmount = 0.0;
         double total = obtenerTotalNumerico();
 
-        String warrantyStart = editGarantiaStart.getText().toString().trim();
-        String warrantyEnd = editGarantiaEnd.getText().toString().trim();
-        String warrantyMonthsStr = editGarantiaMeses.getText().toString().trim();
-        int warrantyMonths = warrantyMonthsStr.isEmpty() ? 0 : Integer.parseInt(warrantyMonthsStr);
+        try {
+            if (editPorcentajeImpuesto != null && editPorcentajeImpuesto.getText() != null) {
+                taxPct = obtenerValorNumerico(editPorcentajeImpuesto.getText().toString());
+            }
+            if (editCantidadImpuesto != null && editCantidadImpuesto.getText() != null) {
+                taxAmount = obtenerValorNumerico(editCantidadImpuesto.getText().toString());
+            }
+            if (editPorcentajeDescuento != null && editPorcentajeDescuento.getText() != null) {
+                discountPct = obtenerValorNumerico(editPorcentajeDescuento.getText().toString());
+            }
+            if (editCantidadDescuento != null && editCantidadDescuento.getText() != null) {
+                discountAmount = obtenerValorNumerico(editCantidadDescuento.getText().toString());
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, R.string.error_valoresnumericos, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validar que el total sea mayor a 0
+        if (total <= 0 && subtotal <= 0) {
+            Toast.makeText(this, R.string.montomayoracero, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int warrantyMonths = 0;
+        if (!warrantyMonthsStr.isEmpty()) {
+            try {
+                warrantyMonths = Integer.parseInt(warrantyMonthsStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, R.string.meses_invalidos, Toast.LENGTH_SHORT).show();
+                editGarantiaMeses.requestFocus();
+                return;
+            }
+        }
 
         FaSafeDB dbHelper = new FaSafeDB(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -1212,17 +1295,14 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
         db.beginTransaction();
         try {
-
             String facturaImagePath = null;
             String productImagePath = null;
-
 
             if (extractedBitmap != null) {
                 facturaImagePath = saveBitmapToFile(extractedBitmap, companyName + "_factura", this);
                 extractedBitmap.recycle();
                 extractedBitmap = null;
             }
-
 
             if (productBitmap != null) {
                 productImagePath = saveBitmapToFile(productBitmap, companyName + "_producto", this);
@@ -1243,49 +1323,51 @@ public class TextoImportadoActivity extends AppCompatActivity {
             invoiceValues.put("currency", "USD");
             invoiceValues.put("notes", notas);
 
-
             if (facturaImagePath != null) {
                 invoiceValues.put("thumbnail_path", facturaImagePath);
             } else if (pdfUri != null) {
                 invoiceValues.put("thumbnail_path", pdfUri.toString());
             }
 
-
             if (productImagePath != null) {
                 invoiceValues.put("product_image_path", productImagePath);
             }
 
-            int storeId = obtenerOCrearStore(db, tienda);
-            int categoryId = obtenerOCrearCategoria(db, categoria);
-
-            if (storeId > 0) {
-                invoiceValues.put("store_id", storeId);
+            // Validar y guardar store y categoría solo si tienen valor
+            if (!tienda.isEmpty()) {
+                int storeId = obtenerOCrearStore(db, tienda);
+                if (storeId > 0) {
+                    invoiceValues.put("store_id", storeId);
+                }
             }
-            if (categoryId > 0) {
-                invoiceValues.put("category_id", categoryId);
+
+            if (!categoria.isEmpty()) {
+                int categoryId = obtenerOCrearCategoria(db, categoria);
+                if (categoryId > 0) {
+                    invoiceValues.put("category_id", categoryId);
+                }
             }
 
             long invoiceId = db.insert("invoices", null, invoiceValues);
             if (invoiceId == -1) {
-                throw new Exception("Error al insertar factura");
+                throw new Exception("Error al insertar factura en la base de datos");
             }
 
-
+            // Guardar items si existen
             guardarItemsEnBaseDeDatos(db, (int) invoiceId);
 
-
-            if (!warrantyStart.isEmpty() && !warrantyEnd.isEmpty()) {
+            // Guardar garantía solo si está completa
+            if (hasCompleteWarranty) {
                 saveWarranty(db, (int) invoiceId, companyName, warrantyStart, warrantyEnd);
                 schedulingNeeded = true;
             }
 
             db.setTransactionSuccessful();
-            Toast.makeText(this, "Factura guardada correctamente", Toast.LENGTH_SHORT).show();
-
-
+            Toast.makeText(this, R.string.factura_guardada_correctamente, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
-            Toast.makeText(this, "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.error_al_guardar) + e.getMessage(), Toast.LENGTH_LONG).show();
+            return;
 
         } finally {
             try { db.endTransaction(); } catch (Exception ignored) {}
@@ -1293,13 +1375,12 @@ public class TextoImportadoActivity extends AppCompatActivity {
             try { dbHelper.close(); } catch (Exception ignored) {}
         }
 
-
         if (schedulingNeeded) {
             new Thread(() -> {
                 try {
                     NotificacionRescheduler.recreateAndScheduleAllWarrantyNotifications(getApplicationContext());
-                } catch (Exception ex) {
-
+                } catch (Exception ignored) {
+                    Log.e("GuardarFactura", "Error al programar notificaciones", ignored);
                 }
             }).start();
         }
@@ -1337,7 +1418,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
     private void guardarItemsEnBaseDeDatos(SQLiteDatabase db, int invoiceId) {
         db.beginTransaction();
         try {
-            String itemsText = editItems.getText().toString().trim();
+            String itemsText = Objects.requireNonNull(editItems.getText()).toString().trim();
             if (TextUtils.isEmpty(itemsText)) {
                 db.endTransaction();
                 return;
@@ -1367,11 +1448,8 @@ public class TextoImportadoActivity extends AppCompatActivity {
                             itemValues.put("unit_price", precio);
 
                             long idResultado = db.insert("invoice_items", null, itemValues);
-                            if (idResultado == -1) {
-
-                            }
                         }
-                    } catch (NumberFormatException e) {
+                    } catch (NumberFormatException ignored) {
 
                     }
                 }
@@ -1379,7 +1457,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
 
             db.setTransactionSuccessful();
 
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         } finally {
             db.endTransaction();
@@ -1430,7 +1508,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 categoryId = cursor.getInt(0);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         } finally {
             if (cursor != null) cursor.close();
@@ -1468,10 +1546,7 @@ public class TextoImportadoActivity extends AppCompatActivity {
             warrantyValues.put("notes", "");
 
             long result = db.insert("warranties", null, warrantyValues);
-            if (result == -1) {
-
-            }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }
@@ -1482,9 +1557,13 @@ public class TextoImportadoActivity extends AppCompatActivity {
             Date end = sdf.parse(endDate);
 
             Calendar startCal = Calendar.getInstance();
-            startCal.setTime(start);
+            if (start != null) {
+                startCal.setTime(start);
+            }
             Calendar endCal = Calendar.getInstance();
-            endCal.setTime(end);
+            if (end != null) {
+                endCal.setTime(end);
+            }
 
             int yearDiff = endCal.get(Calendar.YEAR) - startCal.get(Calendar.YEAR);
             int monthDiff = endCal.get(Calendar.MONTH) - startCal.get(Calendar.MONTH);
@@ -1494,7 +1573,6 @@ public class TextoImportadoActivity extends AppCompatActivity {
             return 0;
         }
     }
-
 
     @Override
     protected void onDestroy() {

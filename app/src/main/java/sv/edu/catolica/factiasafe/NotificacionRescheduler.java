@@ -117,9 +117,18 @@ public class NotificacionRescheduler {
                         int notifId = warrantyId * 100 + d;
 
                         NotificationScheduler.cancelScheduledNotification(ctx, notifId);
-                        String title = "Garantía próxima";
-                        String text = (productName.isEmpty() ? "Una garantía" : productName) + " vence en " + d + " día" + (d==1 ? "" : "s") + ".";
-                        // añadimos a la lista, no programamos aún
+                        String title = ctx.getString(R.string.garantia_proxima);
+                        // Cambio: Se usó strings.xml con plurales
+                        String name = productName.isEmpty() ?
+                                ctx.getString(R.string.unagarantia) :
+                                productName;
+                        String text = ctx.getResources().getQuantityString(
+                                R.plurals.garantiaexpiraen,
+                                d,
+                                name,
+                                d
+                        );
+
                         toSchedule.add(new ScheduleItem(warrantyId, notifId, whenMillis, title, text));
                     }
 

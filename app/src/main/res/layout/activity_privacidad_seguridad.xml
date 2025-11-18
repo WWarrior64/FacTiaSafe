@@ -20,7 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Privacidad y Seguridad"
+            app:title="@string/seguridad_ajustes2"
             app:titleTextColor="?attr/colorOnSecondary"
             app:navigationIcon="@drawable/ic_arrow_back"
             app:navigationIconTint="?attr/colorOnSecondary" />

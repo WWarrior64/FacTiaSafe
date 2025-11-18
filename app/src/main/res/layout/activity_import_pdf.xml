@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorOnPrimary"
-            app:title="Importar PDF"
+            app:title="@string/importar_pdf"
             app:titleTextColor="?attr/colorOnSecondary"
             app:navigationIcon="@drawable/ic_arrow_back"/>
     </com.google.android.material.appbar.AppBarLayout>
@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:text="Puedes adjuntar facturas en formato PDF"
+                android:text="@string/puedes_adjfacturas"
                 android:textSize="16sp"
                 android:textColor="?attr/colorOnSecondary" />
         </androidx.cardview.widget.CardView>
@@ -97,7 +97,7 @@
                             android:id="@+id/upload_icon"
                             android:layout_width="240dp"
                             android:layout_height="240dp"
-                            android:contentDescription="Icono de carga de archivo"
+                            android:contentDescription="@string/icono_de_carga"
                             android:src="@drawable/ic_file_upload_large"
                             app:layout_constraintBottom_toTopOf="@id/upload_text"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -111,7 +111,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="File Upload"
+                            android:text="@string/file_upload"
                             android:textColor="?attr/colorPrimary"
                             android:textSize="20sp"
                             android:textStyle="bold"
@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="12dp"
                     android:paddingBottom="12dp"
-                    android:text="Importar PDF"
+                    android:text="@string/importar_pdf"
                     android:textColor="@color/white"
                     android:textAllCaps="false"
                     android:textSize="18sp"

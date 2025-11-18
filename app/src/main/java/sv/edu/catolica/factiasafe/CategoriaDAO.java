@@ -42,7 +42,7 @@ public class CategoriaDAO {
                 categorias.add(categoria);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error al obtener categorías: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return categorias;
@@ -69,7 +69,7 @@ public class CategoriaDAO {
                 return new Categoria(id, name, description);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error al obtener categoría por ID: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return null;
@@ -93,11 +93,9 @@ public class CategoriaDAO {
             }
 
             id = db.insert("categories", null, values);
-            if (id != -1) {
-                Log.d(TAG, "Categoría insertada con ID: " + id);
-            }
+
         } catch (Exception e) {
-            Log.e(TAG, "Error al insertar categoría: " + e.getMessage(), e);
+            Log.e(TAG,e.getMessage(), e);
         }
 
         return id;
@@ -122,11 +120,10 @@ public class CategoriaDAO {
 
             int rowsAffected = db.update("categories", values, "id = ?", new String[]{String.valueOf(id)});
             if (rowsAffected > 0) {
-                Log.d(TAG, "Categoría actualizada: ID " + id);
                 return true;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error al actualizar categoría: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return false;
@@ -143,11 +140,10 @@ public class CategoriaDAO {
         try {
             int rowsAffected = db.delete("categories", "id = ?", new String[]{String.valueOf(id)});
             if (rowsAffected > 0) {
-                Log.d(TAG, "Categoría eliminada: ID " + id);
                 return true;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error al eliminar categoría: " + e.getMessage(), e);
+            Log.e(TAG,  e.getMessage(), e);
         }
 
         return false;
@@ -170,7 +166,7 @@ public class CategoriaDAO {
 
             return cursor.getCount() > 0;
         } catch (Exception e) {
-            Log.e(TAG, "Error al verificar existencia de categoría: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return false;
@@ -194,7 +190,7 @@ public class CategoriaDAO {
 
             return cursor.getCount() > 0;
         } catch (Exception e) {
-            Log.e(TAG, "Error al verificar existencia de categoría: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
         }
 
         return false;

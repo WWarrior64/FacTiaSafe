@@ -57,7 +57,7 @@ public class ImportPdfActivity extends AppCompatActivity {
                         Uri uri = result.getData().getData();
                         if (uri != null) {
                             String nombreArchivo = obtenerNombreArchivo(uri);
-                            Toast.makeText(this, "Procesando: " + nombreArchivo, Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, getString(R.string.procesando) + nombreArchivo, Toast.LENGTH_LONG).show();
 
                             getContentResolver().takePersistableUriPermission(
                                     uri, Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -66,7 +66,7 @@ public class ImportPdfActivity extends AppCompatActivity {
                             procesarPDF(uri); // ← AQUÍ LLAMAS AL PROCESAMIENTO
                         }
                     } else {
-                        Toast.makeText(this, "Selección de PDF cancelada", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.seleccion_pdf_cancelada, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -97,7 +97,7 @@ public class ImportPdfActivity extends AppCompatActivity {
         findViewById(R.id.upload_area_card).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ImportPdfActivity.this, "Clic en la zona de carga", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ImportPdfActivity.this, R.string.clic_en_la_zona_de_carga, Toast.LENGTH_SHORT).show();
                 // Duplica la lógica del botón principal o la redirige
                 abrirSelectorPdf();
             }
@@ -166,14 +166,14 @@ public class ImportPdfActivity extends AppCompatActivity {
                         finish();
                     } else {
                         Toast.makeText(ImportPdfActivity.this,
-                                "No se pudo extraer texto del PDF", Toast.LENGTH_LONG).show();
+                                R.string.sin_extraer_texto, Toast.LENGTH_LONG).show();
                     }
                 });
 
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     Toast.makeText(ImportPdfActivity.this,
-                            "Error al procesar PDF: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            getString(R.string.error_procesar_pdf) + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
             }
         }).start();

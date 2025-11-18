@@ -112,9 +112,9 @@ public class CategoriasActivity extends AppCompatActivity {
             // Eliminar de la lista y notificar
             categoriasList.remove(position);
             categoriaAdapter.notifyItemRemoved(position);
-            Toast.makeText(this, nombre + " eliminada.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, nombre + getString(R.string.eliminada), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Error al eliminar categoría.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_categoria, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -123,11 +123,11 @@ public class CategoriasActivity extends AppCompatActivity {
      */
     private void mostrarDialogoAdicion() {
         final EditText inputNombre = new EditText(this);
-        inputNombre.setHint("Ej: Vestimenta");
+        inputNombre.setHint(R.string.ej_vestimenta);
         inputNombre.setPadding(50, 50, 50, 50);
 
         final EditText inputDescripcion = new EditText(this);
-        inputDescripcion.setHint("Descripción (opcional)");
+        inputDescripcion.setHint(R.string.descripcion_op);
         inputDescripcion.setPadding(50, 50, 50, 50);
 
         // Crear un contenedor para ambos EditTexts
@@ -137,20 +137,20 @@ public class CategoriasActivity extends AppCompatActivity {
         layout.addView(inputDescripcion);
 
         new AlertDialog.Builder(this)
-                .setTitle("Añadir Nueva Categoría")
+                .setTitle(R.string.nueva_categoria)
                 .setView(layout)
-                .setPositiveButton("Añadir", (dialog, which) -> {
+                .setPositiveButton(R.string.anadir, (dialog, which) -> {
                     String nuevoNombre = inputNombre.getText().toString().trim();
                     String nuevaDescripcion = inputDescripcion.getText().toString().trim();
 
                     if (nuevoNombre.isEmpty()) {
-                        Toast.makeText(this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.nombre_no_vacio, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     // Verificar que no exista otra categoría con ese nombre
                     if (categoriaDAO.existsByName(nuevoNombre)) {
-                        Toast.makeText(this, "Ya existe una categoría con ese nombre.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.categoria_existente, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -160,12 +160,12 @@ public class CategoriasActivity extends AppCompatActivity {
                         Categoria nuevaCategoria = new Categoria((int) id, nuevoNombre, nuevaDescripcion);
                         categoriasList.add(nuevaCategoria);
                         categoriaAdapter.notifyItemInserted(categoriasList.size() - 1);
-                        Toast.makeText(this, nuevoNombre + " añadida.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, nuevoNombre + getString(R.string.anadida), Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Error al guardar la categoría.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.error_guardar_cat, Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(R.string.cancelar_3, null)
                 .show();
     }
 
@@ -182,7 +182,7 @@ public class CategoriasActivity extends AppCompatActivity {
 
         final EditText inputDescripcion = new EditText(this);
         inputDescripcion.setText(categoriaAEditar.getDescripcion());
-        inputDescripcion.setHint("Descripción (opcional)");
+        inputDescripcion.setHint(R.string.descripcion_op);
         inputDescripcion.setPadding(50, 50, 50, 50);
 
         // Crear un contenedor para ambos EditTexts
@@ -192,20 +192,20 @@ public class CategoriasActivity extends AppCompatActivity {
         layout.addView(inputDescripcion);
 
         new AlertDialog.Builder(this)
-                .setTitle("Editar Categoría")
+                .setTitle(R.string.editar_categoria)
                 .setView(layout)
-                .setPositiveButton("Guardar", (dialog, which) -> {
+                .setPositiveButton(R.string.guardar, (dialog, which) -> {
                     String nuevoNombre = inputNombre.getText().toString().trim();
                     String nuevaDescripcion = inputDescripcion.getText().toString().trim();
 
                     if (nuevoNombre.isEmpty()) {
-                        Toast.makeText(this, "El nombre no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.nombre_no_vacio, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     // Verificar que no exista otra categoría con ese nombre (excepto la actual)
                     if (categoriaDAO.existsByNameExcluding(nuevoNombre, categoriaAEditar.getId())) {
-                        Toast.makeText(this, "Ya existe otra categoría con ese nombre.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.categoria_existente, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -214,12 +214,12 @@ public class CategoriasActivity extends AppCompatActivity {
                         categoriaAEditar.setNombre(nuevoNombre);
                         categoriaAEditar.setDescripcion(nuevaDescripcion);
                         categoriaAdapter.notifyItemChanged(position);
-                        Toast.makeText(this, "Categoría actualizada.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.categoria_act, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Error al actualizar la categoría.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.error_act_categoria, Toast.LENGTH_SHORT).show();
                     }
                 })
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(R.string.cancelar_3, null)
                 .show();
     }
 

@@ -53,7 +53,7 @@ public class AjustesActivity extends AppCompatActivity {
 
     public void borrarCacheApp(View view) {
         limpiarCacheDeAplicacion();
-        Toast.makeText(this, "Caché de la aplicación borrado con éxito.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.cache_exito, Toast.LENGTH_SHORT).show();
     }
 
     private void limpiarCacheDeAplicacion() {
@@ -71,7 +71,7 @@ public class AjustesActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Error al intentar borrar el caché.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_cache, Toast.LENGTH_SHORT).show();
         }
     }
 

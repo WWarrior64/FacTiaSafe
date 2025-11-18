@@ -36,15 +36,7 @@ public class NotificacionesActivity extends AppCompatActivity {
     private AutoCompleteTextView autoCompleteTiempo;
 
     // Etiquetas y su representación en días (mantenemos orden lógico)
-    private final LinkedHashMap<String, Integer> opcionesTiempo = new LinkedHashMap<String, Integer>() {{
-        put("1 semana", 7);
-        put("6 días", 6);
-        put("5 días", 5);
-        put("4 días", 4);
-        put("3 días", 3);
-        put("2 días", 2);
-        put("1 día", 1);
-    }};
+    private LinkedHashMap<String, Integer> opcionesTiempo = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +50,14 @@ public class NotificacionesActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        opcionesTiempo.put(getString(R.string.op_1_semana), 7);
+        opcionesTiempo.put(getString(R.string.op_6_dias), 6);
+        opcionesTiempo.put(getString(R.string.op_5_dias), 5);
+        opcionesTiempo.put(getString(R.string.op_4_dias), 4);
+        opcionesTiempo.put(getString(R.string.op_3_dias), 3);
+        opcionesTiempo.put(getString(R.string.op_2_dias), 2);
+        opcionesTiempo.put(getString(R.string.op_1_dia), 1);
 
         toolbar = findViewById(R.id.toolbar_notificaciones);
         buttonGuardar = findViewById(R.id.button_guardar_configuracion);
@@ -97,7 +97,7 @@ public class NotificacionesActivity extends AppCompatActivity {
         buttonGuardar.setOnClickListener(v -> {
             String label = autoCompleteTiempo.getText() != null ? autoCompleteTiempo.getText().toString().trim() : "";
             if (label.isEmpty() || !opcionesTiempo.containsKey(label)) {
-                Toast.makeText(this, "Seleccione un tiempo válido", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.selecc_tiempo_valido, Toast.LENGTH_SHORT).show();
                 autoCompleteTiempo.showDropDown();
                 return;
             }
@@ -105,12 +105,12 @@ public class NotificacionesActivity extends AppCompatActivity {
             int days = opcionesTiempo.get(label);
             boolean ok = saveLeadTimeSetting(label, days);
             if (ok) {
-                Toast.makeText(this, "Configuración guardada (" + label + ")", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.conf_guardada) + label + ")", Toast.LENGTH_SHORT).show();
                 // TODO: aquí podrías reprogramar alarms/recordatorios según 'days'
                 // scheduleReminders(days);
                 finish();
             } else {
-                Toast.makeText(this, "Error guardando configuración", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.error_guardar_conf, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -172,7 +172,7 @@ public class NotificacionesActivity extends AppCompatActivity {
             }
 
         } catch (Exception e) {
-            Toast.makeText(this, "Error leyendo configuración: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.error_leyendo_conf) + e.getMessage(), Toast.LENGTH_SHORT).show();
         } finally {
             if (cur != null) try { cur.close(); } catch (Exception ignored) {}
             if (db != null) try { db.close(); } catch (Exception ignored) {}

@@ -76,7 +76,7 @@ public class GarantiasActivity extends BaseActivity {
         });
 
         // Toolbar
-        setToolbarTitle("Garantías");
+        setToolbarTitle(getString(R.string.garantias));
         showUpButton(false);
 
         ImageButton searchButton = toolbar.findViewById(R.id.search_button);
@@ -114,7 +114,7 @@ public class GarantiasActivity extends BaseActivity {
 
     private void handleChipClick(Chip chip, String filterType) {
         handleChipSelection(chip);
-        Toast.makeText(this, "Filtrando garantías por: " + chip.getText(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.filtrando_garantias) + chip.getText(), Toast.LENGTH_SHORT).show();
         loadWarranties(filterType);
     }
 
@@ -159,10 +159,10 @@ public class GarantiasActivity extends BaseActivity {
                     i.putExtra("invoice_id", (int) warranty.invoiceId);
                     startActivity(i);
                 } catch (Exception e) {
-                    Toast.makeText(this, "Abrir factura: id=" + warranty.invoiceId, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.abrir_factura_id) + warranty.invoiceId, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(this, "Garantía seleccionada: id=" + warranty.id, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.garantia_seleccionada_id) + warranty.id, Toast.LENGTH_SHORT).show();
             }
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -258,7 +258,7 @@ public class GarantiasActivity extends BaseActivity {
             runOnUiThread(() -> {
                 adapter.setItems(warrantyList);
                 if (warrantyList.isEmpty()) {
-                    Toast.makeText(GarantiasActivity.this, "No hay garantías para mostrar", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GarantiasActivity.this, R.string.no_hay_garantias, Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -282,10 +282,10 @@ public class GarantiasActivity extends BaseActivity {
                     i.putExtra("invoice_id", (int) warranty.invoiceId);
                     startActivity(i);
                 } catch (Exception e) {
-                    Toast.makeText(this, "Abrir factura: id=" + warranty.invoiceId, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.abrir_factura_id) + warranty.invoiceId, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                Toast.makeText(this, "Garantía seleccionada: id=" + warranty.id, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.garantia_seleccionada_id) + warranty.id, Toast.LENGTH_SHORT).show();
             }
         });
         resultsRv.setLayoutManager(new LinearLayoutManager(this));

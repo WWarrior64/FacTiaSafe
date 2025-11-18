@@ -48,7 +48,7 @@ public class EditarFacturaActivity extends AppCompatActivity {
         // Get invoice ID from intent
         invoiceId = getIntent().getIntExtra("invoice_id", -1);
         if (invoiceId == -1) {
-            Toast.makeText(this, "ID de factura no proporcionado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.id_noproporcionado, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -89,7 +89,7 @@ public class EditarFacturaActivity extends AppCompatActivity {
     private void saveChanges() {
     // obtener fragments desde el adapter guardado
         if (pagerAdapter == null) {
-            Toast.makeText(this, "Error interno: adapter no inicializado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.error_adapter, Toast.LENGTH_SHORT).show();
             return;
         }
         Fragment f0 = pagerAdapter.getFragment(0);
@@ -112,7 +112,7 @@ public class EditarFacturaActivity extends AppCompatActivity {
             }
         }
         if (!(f0 instanceof DatosPrincipalesFragment)) {
-            Toast.makeText(this, "No se encontró DatosPrincipalesFragment", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_encontrado_principal, Toast.LENGTH_SHORT).show();
             return;
         }
         DatosPrincipalesFragment principalesFragment = (DatosPrincipalesFragment) f0;
@@ -152,13 +152,13 @@ public class EditarFacturaActivity extends AppCompatActivity {
             if (extraFragment != null) extraFragment.saveIntoDatabase(db);
 
             db.setTransactionSuccessful();
-            Toast.makeText(this, "Factura actualizada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.factura_actualizada, Toast.LENGTH_SHORT).show();
 
             // señalamos que hay que re-crear notificaciones cuando la transacción termine
             schedulingNeeded = true;
 
         } catch (Exception e) {
-            Toast.makeText(this, "Error al guardar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.error_al_guardar) + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         } finally {
             try { db.endTransaction(); } catch (Exception ignored) {}

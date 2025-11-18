@@ -77,7 +77,7 @@ public class DatosExtraFragment extends Fragment {
                                 loadProductImageIntoView(savedPath);
                             }
                         } catch (Exception e) {
-                            Log.e(TAG, "Error guardando imagen: " + e.getMessage(), e);
+                            Log.e(TAG, e.getMessage(), e);
                         }
                     }
                 }
@@ -364,7 +364,7 @@ public class DatosExtraFragment extends Fragment {
             is.close();
             return outFile.getAbsolutePath();
         } catch (Exception e) {
-            Log.e(TAG, "copyUriToInternalStorage error: " + e.getMessage(), e);
+            Log.e(TAG, e.getMessage(), e);
             return "";
         }
     }

@@ -61,7 +61,7 @@ public class EscanearImagenFragment extends Fragment {
     }
 
     private void mostrarImagen() {
-        Log.d(TAG, "🖼️ mostrarImagen llamado - path: " + photoPath);
+
 
         if (containerImagenes == null) {
             return;

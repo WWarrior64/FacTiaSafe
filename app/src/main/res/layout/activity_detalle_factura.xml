@@ -35,7 +35,7 @@
             android:id="@+id/texto_titulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Detalles de Factura"
+            android:text="@string/detalles_de_factura"
             android:textSize="18sp"
             android:textColor="?attr/colorOnSecondary"
             android:textStyle="normal"
@@ -152,7 +152,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
-                android:text="Lista de Items"
+                android:text="@string/lista_de_items"
                 android:textColor="?attr/colorOnSecondary"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -190,7 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
-                android:text="Totales"
+                android:text="@string/totales"
                 android:textColor="?attr/colorOnSecondary"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -226,7 +226,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
-                            android:text="Subtotal"
+                            android:text="@string/subtotal"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
 
@@ -236,7 +236,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="start"
-                            android:text="$ 0.00"
+                            android:text="@string/subtotal_cantidad"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
 
@@ -246,7 +246,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:text="Impuesto aplicado"
+                        android:text="@string/impuesto_aplicado"
                         android:textColor="?attr/colorOnSecondary"
                         android:textSize="14sp" />
 
@@ -270,7 +270,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            android:text="Impuesto (%)"
+                            android:text="@string/impuesto_porcentaje"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
 
@@ -297,7 +297,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            android:text="Impuesto ($)"
+                            android:text="@string/impuesto_signo"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
 
@@ -324,7 +324,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            android:text="Descuento (%)"
+                            android:text="@string/descuento_porcentaje"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
 
@@ -351,7 +351,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            android:text="Descuento ($)"
+                            android:text="@string/descuento_signo"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="14sp" />
 
@@ -378,7 +378,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Total Final"
+                            android:text="@string/total_final"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="16sp"
                             android:textStyle="bold" />
@@ -387,7 +387,7 @@
                             android:id="@+id/text_total_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="$ 0.00"
+                            android:text="@string/totalfinal_cantidad"
                             android:textColor="?attr/colorOnSecondary"
                             android:textSize="18sp"
                             android:textStyle="bold" />
@@ -404,7 +404,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
-                android:text="Garantía"
+                android:text="@string/garantia"
                 android:textColor="?attr/colorOnSecondary"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -501,7 +501,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Garantía (Meses)"
+                        android:text="@string/garantia_meses"
                         android:textColor="?attr/colorOnSecondary"
                         android:textSize="14sp" />
 
@@ -525,7 +525,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
-                android:text="Datos Extras"
+                android:text="@string/datos_extras"
                 android:textColor="?attr/colorOnSecondary"
                 android:textStyle="bold"
                 android:textSize="16sp"
@@ -750,7 +750,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Editar"
+                android:text="@string/editar"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="13sp"
                 android:textStyle="bold"
@@ -789,7 +789,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Borrar"
+                android:text="@string/borrar"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="13sp"
                 android:textStyle="bold"
@@ -828,7 +828,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Exportar PDF"
+                android:text="@string/exportar_pdf"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="12sp"
                 android:textStyle="bold"

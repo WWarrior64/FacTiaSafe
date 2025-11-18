@@ -89,7 +89,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         // Obtener el ID de la factura desde el Intent
         invoiceId = getIntent().getIntExtra("invoice_id", -1);
         if (invoiceId == -1) {
-            Toast.makeText(this, "ID de factura no proporcionado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.id_noproporcionado, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -145,7 +145,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         // Cargar datos principales de la factura
         Cursor invoiceCursor = db.rawQuery("SELECT * FROM invoices WHERE id = ?", new String[]{String.valueOf(invoiceId)});
         if (!invoiceCursor.moveToFirst()) {
-            Toast.makeText(this, "Factura no encontrada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.fact_no_encontrada, Toast.LENGTH_SHORT).show();
             invoiceCursor.close();
             db.close();
             finish();
@@ -327,9 +327,9 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             db.close();
             
             if (deleted > 0) {
-                Toast.makeText(this, "Factura borrada", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.factura_borrada, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Error al borrar la factura", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.error_borrar_factura, Toast.LENGTH_SHORT).show();
             }
             finish();
         });
@@ -342,23 +342,22 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             }
 
             actionExportarPdf.setEnabled(false);
-            Toast.makeText(DetalleFacturaActivity.this, "Generando PDF...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DetalleFacturaActivity.this, R.string.generando_pdf, Toast.LENGTH_SHORT).show();
             new Thread(() -> {
                 try {
                     String outPath = generateInvoicePdf();
                     runOnUiThread(() -> {
                         actionExportarPdf.setEnabled(true);
                         if (outPath != null) {
-                            Toast.makeText(DetalleFacturaActivity.this, "PDF guardado: " + outPath, Toast.LENGTH_LONG).show();
+                            Toast.makeText(DetalleFacturaActivity.this, getString(R.string.pdf_guardado) + outPath, Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(DetalleFacturaActivity.this, "Error generando PDF", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(DetalleFacturaActivity.this, R.string.error_generando_pdf, Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (Exception e) {
-                    Log.e(TAG, "Error generando PDF", e);
                     runOnUiThread(() -> {
                         actionExportarPdf.setEnabled(true);
-                        Toast.makeText(DetalleFacturaActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(DetalleFacturaActivity.this, getString(R.string.error2_escaneo) + e.getMessage(), Toast.LENGTH_LONG).show();
                     });
                 }
             }).start();
@@ -386,9 +385,9 @@ public class DetalleFacturaActivity extends AppCompatActivity {
         if (requestCode == REQ_WRITE_STORAGE) {
             boolean ok = (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED);
             if (!ok) {
-                Toast.makeText(this, "Permiso denegado: no se puede guardar en carpeta pública.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.perm_denegado, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Permiso concedido. Pulse Exportar PDF nuevamente.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.perm_concedido, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -899,7 +898,6 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             // devolver la ruta legible (para que el Toast muestre esto)
             return displayPath;
         } catch (Exception e) {
-            Log.e(TAG, "generateInvoicePdf error", e);
             if (pdf != null) pdf.close();
             return null;
         } finally {
@@ -965,9 +963,7 @@ public class DetalleFacturaActivity extends AppCompatActivity {
             try {
                 uri = getContentResolver().insert(collection, values);
             } catch (IllegalArgumentException | SecurityException ex) {
-                // si falla por restricciones de colección (ej: ROM extra estricta),
-                // si intentamos Documents y falla, caemos a Downloads/FactiaSafe
-                Log.w(TAG, "Insert en MediaStore falló para collection " + collection + ": " + ex.getMessage());
+
                 if (wantDocuments) {
                     // reintentar con Downloads/FactiaSafe
                     collection = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);

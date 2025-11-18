@@ -52,7 +52,7 @@ public class FaSafeDB extends SQLiteOpenHelper {
             }
             copyPrebuiltDatabase();
         } catch (Exception e) {
-            Toast.makeText(context, "Error en upgrade: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.errorenupgrade) + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -69,7 +69,7 @@ public class FaSafeDB extends SQLiteOpenHelper {
                 }
                 output.flush();
             } catch (IOException e) {
-                Toast.makeText(context, "Error al copiar DB: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.errorcopiarbd) + e.getMessage(), Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
         }

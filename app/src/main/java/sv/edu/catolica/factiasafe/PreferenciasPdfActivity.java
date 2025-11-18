@@ -85,29 +85,29 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
                         // Crear subcarpetas FactiaSafe/Facturas
                         DocumentFile rootDir = DocumentFile.fromTreeUri(this, uri);
                         if (rootDir == null) {
-                            Toast.makeText(this, "Error al acceder a la carpeta seleccionada", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, R.string.error_acceso_carpeta, Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         DocumentFile factiaDir = findOrCreateDir(rootDir, "FactiaSafe");
                         if (factiaDir == null) {
-                            Toast.makeText(this, "Error al crear carpeta FactiaSafe", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, R.string.error_carpeta_crear, Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         DocumentFile facturasDir = findOrCreateDir(factiaDir, "Facturas");
                         if (facturasDir == null) {
-                            Toast.makeText(this, "Error al crear carpeta Facturas", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, R.string.error_carpeta_crear_facturas, Toast.LENGTH_SHORT).show();
                             return;
                         }
 
                         String uriStr = facturasDir.getUri().toString();
                         setSetting(KEY_PDF_PATH, uriStr);
                         labelRuta.setText(displayPathFromString(uriStr));
-                        Toast.makeText(this, "Ruta pública seleccionada y guardada", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.ruta_publica, Toast.LENGTH_SHORT).show();
                     } else {
                         // Usuario canceló
-                        Toast.makeText(this, "Selección cancelada: no se cambió la ruta", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.sin_cambio_ruta, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -170,7 +170,7 @@ public class PreferenciasPdfActivity extends AppCompatActivity {
 
         setSetting(KEY_INCLUIR_PRODUCTOS, String.valueOf(incluirProductos));
 
-        Toast.makeText(this, "Configuración guardada correctamente", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.conf_guardada_correct, Toast.LENGTH_SHORT).show();
         finish();
     }
 

@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -113,10 +114,10 @@ public class SplashActivity extends Activity {
 
     // --- DIÁLOGO 1: OPTIMIZACIÓN ESTÁNDAR (DOZE) ---
     private void showBatteryOptimizationDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Paso 1: Exclusión de Optimización")
-                .setMessage("El sistema Android intenta ahorrar batería bloqueando las alarmas. Para evitarlo, permite que FactiaSafe ignore las optimizaciones de batería (modo Doze).")
-                .setPositiveButton("Permitir", (dialog, which) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.titulo_dialogo_optimizacion)
+                .setMessage(R.string.mensaje_dialogo_optimizacion)
+                .setPositiveButton(R.string.permitir, (dialog, which) -> {
                     // Marcamos solo este permiso como preguntado
                     prefs.edit().putBoolean(PREF_ASKED_BATTERY_OPT, true).apply();
                     BatteryUtils.requestIgnoreBatteryOptimizations(this);
@@ -125,7 +126,7 @@ public class SplashActivity extends Activity {
                     // Continuar al siguiente paso después del diálogo
                     showAutostartDialog();
                 })
-                .setNegativeButton("Continuar Sin Permiso", (dialog, which) -> {
+                .setNegativeButton(R.string.nopermitir, (dialog, which) -> {
                     // Si el usuario lo omite, pasamos directamente al siguiente permiso.
                     prefs.edit().putBoolean(PREF_ASKED_BATTERY_OPT, true).apply();
                     dialog.dismiss();
@@ -136,10 +137,10 @@ public class SplashActivity extends Activity {
     }
 
     private void showAutostartDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Paso 2: Permiso de Fondo/Autoinicio")
-                .setMessage("En dispositivos modernos (como el tuyo), a veces es necesario un permiso adicional de 'Ejecución en Segundo Plano' o 'Autoinicio' para que las notificaciones funcionen con la app cerrada.")
-                .setPositiveButton("Abrir Ajustes", (d, w) -> {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.titulo_dialogo_optimizacion2)
+                .setMessage(R.string.mensaje_dialogo_optimizacion2)
+                .setPositiveButton(R.string.abrirajustes, (d, w) -> {
                     // Marcamos solo este permiso como preguntado
                     prefs.edit().putBoolean(PREF_ASKED_AUTOSTART, true).apply();
                     boolean ok = BatteryUtils.tryOpenAutostartSettings(this);
@@ -147,14 +148,14 @@ public class SplashActivity extends Activity {
                     if (!ok) {
                         // Fallback: abrir la pantalla de detalles de la App (Tu FIX)
                         BatteryUtils.openAppDetailsSettings(this);
-                        Toast.makeText(this, "Busca 'Batería' o 'Ejecución en Segundo Plano' y ACTÍVALA.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.busca_bateria, Toast.LENGTH_LONG).show();
                     }
                     d.dismiss();
 
                     // ¡IMPORTANTE! El usuario sale de la app a Settings.
                     // No llamamos a continueToAppWithDelay. Esperamos al próximo onCreate/onStart para continuar.
                 })
-                .setNegativeButton("Continuar Sin Permiso", (dialog, which) -> {
+                .setNegativeButton(R.string.nopermitir, (dialog, which) -> {
                     // Marcar como preguntado para no molestar más
                     prefs.edit().putBoolean(PREF_ASKED_AUTOSTART, true).apply();
                     dialog.dismiss();
@@ -237,7 +238,7 @@ public class SplashActivity extends Activity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 PdfFolderUtils.ensureDefaultPdfFolder(this);
             } else {
-                Toast.makeText(this, "Permiso denegado: no se puede crear carpeta pública sin permiso.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permiso_denegado_carpeta, Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -246,10 +247,10 @@ public class SplashActivity extends Activity {
         if (requestCode == REQ_POST_NOTIFICATIONS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permiso concedido -> opcional: mostrar un Toast o registrar en prefs
-                Toast.makeText(this, "Permiso de notificaciones concedido", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permiso_de_notificaciones_concedido, Toast.LENGTH_SHORT).show();
             } else {
                 // Denegado -> el usuario siempre puede activarlo manualmente en settings
-                Toast.makeText(this, "Permiso de notificaciones no concedido. Puede activarlo en ajustes.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.permiso_notificaciones_noconcedido, Toast.LENGTH_LONG).show();
             }
         }
     }
