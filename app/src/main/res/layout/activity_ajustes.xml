@@ -277,6 +277,7 @@
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:text="@string/btn_cache"
+                android:onClick="borrarCacheApp"
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="14sp"
                 android:textStyle="bold"

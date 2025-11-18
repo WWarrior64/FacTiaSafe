@@ -42,6 +42,7 @@ dependencies {
     implementation libs.vision.common
     implementation libs.tess.two
     implementation libs.play.services.mlkit.text.recognition
+    implementation 'com.tom-roush:pdfbox-android:2.0.27.0'
     implementation 'com.itextpdf.android:kernel-android:9.2.0'
     implementation 'com.itextpdf.android:io-android:9.2.0'
     implementation 'com.itextpdf.android:bouncy-castle-adapter-android:9.2.0'

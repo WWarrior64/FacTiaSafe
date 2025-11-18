@@ -3,12 +3,15 @@ package sv.edu.catolica.factiasafe;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import java.io.File;
 
 public class AjustesActivity extends AppCompatActivity {
 
@@ -47,4 +50,45 @@ public class AjustesActivity extends AppCompatActivity {
         Intent ventana = new Intent(AjustesActivity.this, NotificacionesActivity.class);
         startActivity(ventana);
     }
+
+    public void borrarCacheApp(View view) {
+        limpiarCacheDeAplicacion();
+        Toast.makeText(this, "Caché de la aplicación borrado con éxito.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void limpiarCacheDeAplicacion() {
+        try {
+            // directorio de caché interno
+            File cacheDir = getApplicationContext().getCacheDir();
+            if (cacheDir != null && cacheDir.isDirectory()) {
+                borrarDirectorio(cacheDir);
+            }
+
+            // directorio de caché externo (si existe)
+            File externalCacheDir = getApplicationContext().getExternalCacheDir();
+            if (externalCacheDir != null && externalCacheDir.isDirectory()) {
+                borrarDirectorio(externalCacheDir);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error al intentar borrar el caché.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean borrarDirectorio(File dir) {
+        if (dir != null && dir.isDirectory()) {
+
+            String[] elementos = dir.list();
+            for (String elemento : elementos) {
+
+                boolean exito = borrarDirectorio(new File(dir, elemento));
+                if (!exito) {
+
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
+
 }

@@ -97,14 +97,76 @@ public class EscanearTextoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_escanear_texto, container, false);
+
+        String tempImagePath = null;
+
         if (getArguments() != null) {
             datosExtraidos = (HashMap<String, Object>) getArguments().getSerializable("datos_extraidos");
-            imagenEscaneadaPath = getArguments().getString("imagen_path");
+            tempImagePath = getArguments().getString("imagen_path");
             textoOcr = getArguments().getString("ocr_text");
         }
+
+        if (!TextUtils.isEmpty(tempImagePath)) {
+            try {
+
+                String savedPath = persistirImagenEscaneada(tempImagePath);
+                if (!TextUtils.isEmpty(savedPath)) {
+                    imagenEscaneadaPath = savedPath;
+                } else {
+                    imagenEscaneadaPath = tempImagePath;
+                }
+            } catch (Exception e) {
+                imagenEscaneadaPath = tempImagePath;
+            }
+        } else {
+            imagenEscaneadaPath = null;
+        }
+
         invoiceDAO = new InvoiceDAO(getContext());
         return view;
     }
+
+    private String persistirImagenEscaneada(String pathString) {
+        if (TextUtils.isEmpty(pathString)) return null;
+
+
+        if (pathString.startsWith(requireContext().getFilesDir().getAbsolutePath())) {
+            return pathString;
+        }
+
+        File tempFile = new File(pathString);
+        if (!tempFile.exists()) {
+            return null;
+        }
+
+        try {
+            File invoicesDir = new File(requireContext().getFilesDir(), "invoices");
+            if (!invoicesDir.exists()) invoicesDir.mkdirs();
+
+
+            String filename = "scanned_invoice_" + System.currentTimeMillis() + ".jpg";
+            File outFile = new File(invoicesDir, filename);
+
+
+            java.io.FileInputStream fis = new java.io.FileInputStream(tempFile);
+            FileOutputStream fos = new FileOutputStream(outFile);
+
+            byte[] buf = new byte[4096];
+            int len;
+            while ((len = fis.read(buf)) > 0) {
+                fos.write(buf, 0, len);
+            }
+            fos.flush();
+            fos.close();
+            fis.close();
+
+            return outFile.getAbsolutePath();
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
