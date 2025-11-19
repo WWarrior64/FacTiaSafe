@@ -270,6 +270,8 @@
     <string name="error_al_guardar2">"Erro ao salvar: "</string>
     <string name="factura_guardada_con_id">"Fatura salva com ID: "</string>
     <string name="error_insertar_factura">Erro ao inserir a fatura</string>
+    <string name="permiso_de_almacenamiento_concedido">Permissão de armazenamento concedida</string>
+    <string name="permiso_de_c_mara_concedido">Permissão de câmera concedida</string>
     <plurals name="garantiaexpiraen">
         <item quantity="zero">%1$s vence hoje.</item>
         <item quantity="one">%1$s vence em %2$d dia.</item>

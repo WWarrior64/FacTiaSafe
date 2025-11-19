@@ -270,6 +270,8 @@
     <string name="error_al_guardar2">"Erreur lors de l'enregistrement : "</string>
     <string name="factura_guardada_con_id">"Facture enregistrée avec ID : "</string>
     <string name="error_insertar_factura">Erreur lors de l\'insertion de la facture</string>
+    <string name="permiso_de_almacenamiento_concedido">Permission de stockage accordée</string>
+    <string name="permiso_de_c_mara_concedido">Permission de caméra accordée</string>
     <plurals name="garantiaexpiraen">
         <item quantity="zero">%1$s expire aujourd\'hui.</item>
         <item quantity="one">%1$s expire dans %2$d jour.</item>

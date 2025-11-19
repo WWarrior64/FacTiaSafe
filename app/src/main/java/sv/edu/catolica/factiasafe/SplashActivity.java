@@ -311,9 +311,9 @@ public class SplashActivity extends Activity {
         // Manejar permiso de almacenamiento
         if (requestCode == REQ_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permiso de almacenamiento concedido", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permiso_de_almacenamiento_concedido, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permiso_de_almacenamiento_concedido, Toast.LENGTH_SHORT).show();
             }
             // Pedir siguiente permiso
             requestPermissionsIfNeeded();
@@ -323,9 +323,9 @@ public class SplashActivity extends Activity {
         // Manejar permiso de cámara
         if (requestCode == REQ_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permiso de cámara concedido", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permiso_de_c_mara_concedido, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.permiso_de_c_mara_concedido, Toast.LENGTH_SHORT).show();
             }
             // Continuar la app
             continueToAppWithDelay();

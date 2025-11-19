@@ -271,6 +271,8 @@
     <string name="error_al_guardar2">"Error saving: "</string>
     <string name="factura_guardada_con_id">"Invoice saved with ID: "</string>
     <string name="error_insertar_factura">Error inserting the invoice</string>
+    <string name="permiso_de_almacenamiento_concedido">Storage permission granted</string>
+    <string name="permiso_de_c_mara_concedido">Camera permission granted</string>
     <plurals name="garantiaexpiraen">
         <item quantity="zero">%1$s expires today.</item>
         <item quantity="one">%1$s expires in %2$d day.</item>

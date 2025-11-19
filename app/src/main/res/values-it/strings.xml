@@ -270,7 +270,8 @@
     <string name="error_al_guardar2">"Errore durante il salvataggio: "</string>
     <string name="factura_guardada_con_id">"Fattura salvata con ID: "</string>
     <string name="error_insertar_factura">Errore durante l\'inserimento della fattura</string>
-
+    <string name="permiso_de_almacenamiento_concedido">Permesso di archiviazione concesso</string>
+    <string name="permiso_de_c_mara_concedido">Permesso della fotocamera concesso</string>
     <plurals name="garantiaexpiraen">
         <item quantity="zero">%1$s scade oggi.</item>
         <item quantity="one">%1$s scade in %2$d giorno.</item>
