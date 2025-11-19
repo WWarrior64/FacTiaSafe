@@ -37,6 +37,7 @@
         android:theme="@style/Theme.FacTiaSafe">
         <activity
             android:name=".TextoImportadoActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
 
         <receiver
@@ -96,9 +97,11 @@
             android:exported="false" />
         <activity
             android:name=".EditarFacturaActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".EscanearActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <activity
             android:name=".ImportPdfActivity"
