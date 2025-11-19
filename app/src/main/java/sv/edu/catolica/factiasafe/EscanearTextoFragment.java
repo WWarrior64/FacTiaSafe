@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
+import android.content.Context;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -107,17 +108,9 @@ public class EscanearTextoFragment extends Fragment {
         }
 
         if (!TextUtils.isEmpty(tempImagePath)) {
-            try {
-
-                String savedPath = persistirImagenEscaneada(tempImagePath);
-                if (!TextUtils.isEmpty(savedPath)) {
-                    imagenEscaneadaPath = savedPath;
-                } else {
-                    imagenEscaneadaPath = tempImagePath;
-                }
-            } catch (Exception e) {
-                imagenEscaneadaPath = tempImagePath;
-            }
+            // NO persistir aquí - solo guardar la ruta temporal
+            // Se persistirá solo cuando el usuario guarde
+            imagenEscaneadaPath = tempImagePath;
         } else {
             imagenEscaneadaPath = null;
         }
@@ -129,40 +122,58 @@ public class EscanearTextoFragment extends Fragment {
     private String persistirImagenEscaneada(String pathString) {
         if (TextUtils.isEmpty(pathString)) return null;
 
-
+        // Si ya está en almacenamiento interno persistente, devolver tal cual
         if (pathString.startsWith(requireContext().getFilesDir().getAbsolutePath())) {
             return pathString;
-        }
-
-        File tempFile = new File(pathString);
-        if (!tempFile.exists()) {
-            return null;
         }
 
         try {
             File invoicesDir = new File(requireContext().getFilesDir(), "invoices");
             if (!invoicesDir.exists()) invoicesDir.mkdirs();
 
-
             String filename = "scanned_invoice_" + System.currentTimeMillis() + ".jpg";
             File outFile = new File(invoicesDir, filename);
 
+            InputStream inputStream = null;
+            
+            // Soportar tanto URIs (content://) como rutas de archivo (file://)
+            if (pathString.startsWith("content://") || pathString.startsWith("file://")) {
+                // Es una URI - usar ContentResolver
+                Uri uri = Uri.parse(pathString);
+                inputStream = requireContext().getContentResolver().openInputStream(uri);
+                Log.d(TAG, "Leyendo imagen desde URI: " + pathString);
+            } else {
+                // Es una ruta de archivo
+                File tempFile = new File(pathString);
+                if (!tempFile.exists()) {
+                    Log.e(TAG, "Archivo temporal no existe: " + pathString);
+                    return null;
+                }
+                inputStream = new java.io.FileInputStream(tempFile);
+                Log.d(TAG, "Leyendo imagen desde archivo: " + pathString);
+            }
 
-            java.io.FileInputStream fis = new java.io.FileInputStream(tempFile);
+            if (inputStream == null) {
+                Log.e(TAG, "No se pudo abrir inputStream para: " + pathString);
+                return null;
+            }
+
             FileOutputStream fos = new FileOutputStream(outFile);
 
             byte[] buf = new byte[4096];
             int len;
-            while ((len = fis.read(buf)) > 0) {
+            while ((len = inputStream.read(buf)) > 0) {
                 fos.write(buf, 0, len);
             }
             fos.flush();
             fos.close();
-            fis.close();
+            inputStream.close();
 
+            Log.d(TAG, "Imagen escaneada guardada en: " + outFile.getAbsolutePath());
             return outFile.getAbsolutePath();
 
         } catch (Exception e) {
+            Log.e(TAG, "Error persistiendo imagen: " + e.getMessage(), e);
             return null;
         }
     }
@@ -577,7 +588,21 @@ public class EscanearTextoFragment extends Fragment {
         calcularTotales();
         calcularMesesGarantia();
         HashMap<String, Object> datos = recopilarDatosDelFormulario();
-        datos.put("imagen_escaneada_path", imagenEscaneadaPath);
+        
+        // IMPORTANTE: Persistir la imagen escaneada SOLO si el usuario la confirma
+        String imagenPersistida = imagenEscaneadaPath;
+        if (!TextUtils.isEmpty(imagenEscaneadaPath)) {
+            imagenPersistida = persistirImagenEscaneada(imagenEscaneadaPath);
+            if (!TextUtils.isEmpty(imagenPersistida)) {
+                Log.d(TAG, "Imagen escaneada persistida en: " + imagenPersistida);
+            } else {
+                // Si falló la persistencia, usar la ruta temporal (no es ideal pero continuamos)
+                imagenPersistida = imagenEscaneadaPath;
+                Log.w(TAG, "No se pudo persistir imagen, usando ruta temporal");
+            }
+        }
+        
+        datos.put("imagen_escaneada_path", imagenPersistida);
         // Logs para datos adicionales
         if (!tiendaComercio.isEmpty()) {
             Log.d(TAG, "Guardando con tienda_comercio: " + tiendaComercio);

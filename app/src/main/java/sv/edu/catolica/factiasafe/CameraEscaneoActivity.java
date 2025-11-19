@@ -98,18 +98,11 @@ public class CameraEscaneoActivity extends AppCompatActivity {
             GmsDocumentScanningResult.Page page = pages.get(0);
             Uri imageUri = page.getImageUri();
 
-
-
-            String filePath = convertUriToFilePath(imageUri);
+            // NO copiar aquí - solo pasar la URI temporal
+            // Se guardará permanentemente solo si el usuario lo confirma en EscanearActivity
 
             ArrayList<String> imagePaths = new ArrayList<>();
-            if (filePath != null) {
-                imagePaths.add(filePath);
-
-            } else {
-                imagePaths.add(imageUri.toString());
-
-            }
+            imagePaths.add(imageUri.toString());
 
             Intent resultIntent = new Intent();
             resultIntent.putStringArrayListExtra("photo_paths", imagePaths);
@@ -124,8 +117,6 @@ public class CameraEscaneoActivity extends AppCompatActivity {
 
         finish();
     }
-
-
     private String convertUriToFilePath(Uri uri) {
         try {
             String uriString = uri.toString();
