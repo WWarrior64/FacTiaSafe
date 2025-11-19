@@ -85,7 +85,7 @@ public class ImportPdfActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Aquí iría la lógica para abrir el selector de archivos
-                Toast.makeText(ImportPdfActivity.this, "", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ImportPdfActivity.this, R.string.clic_en_la_zona_de_carga, Toast.LENGTH_SHORT).show();
                 // Por ejemplo, iniciar una intención para seleccionar un PDF:
                 // Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 // intent.setType("application/pdf");
