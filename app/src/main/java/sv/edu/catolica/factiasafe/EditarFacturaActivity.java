@@ -31,7 +31,8 @@ public class EditarFacturaActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private MaterialButton buttonGuardar, buttonCancelar;
     private ViewPager2 viewPager;
-    private final String[] tabTitles = new String[]{"Datos Principales", "Datos Extras"};
+    private String[] tabTitles;
+
     private int invoiceId;
     private EditarPagerAdapter pagerAdapter;
 
@@ -65,6 +66,8 @@ public class EditarFacturaActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
             getSupportActionBar().setTitle("Editar Factura");
         }
+
+        tabTitles = getResources().getStringArray(R.array.tab_titles);
 
         setupViewPager();
         setupListeners();

@@ -594,11 +594,11 @@ public class EscanearTextoFragment extends Fragment {
         Log.d(TAG, "Datos finales para guardar: " + datos.toString());
         long invoiceId = invoiceDAO.insertInvoice(datos);
         if (invoiceId > 0) {
-            Toast.makeText(getContext(), "Factura guardada con ID: " + invoiceId, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.factura_guardada_con_id) + invoiceId, Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Factura guardada exitosamente con ID: " + invoiceId);
             requireActivity().finish();
         } else {
-            Toast.makeText(getContext(), "Error al insertar la factura", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.error_insertar_factura, Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Error al insertar factura");
         }
     }

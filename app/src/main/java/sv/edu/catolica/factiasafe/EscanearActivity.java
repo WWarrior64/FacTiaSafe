@@ -352,7 +352,7 @@ public class EscanearActivity extends AppCompatActivity {
                                       Log.w(TAG, "⚠ OCR devolvió texto vacío. Posibles causas: " +
                                               "imagen muy pequeña, baja resolución, ángulo incorrecto");
                                       Toast.makeText(EscanearActivity.this,
-                                          "OCR no detectó texto. Intenta con mejor iluminación o acerca la cámara.",
+                                          R.string.ocr_no_detect_texto_intenta_con_mejor_iluminaci_n_o_acerca_la_c_mara,
                                           Toast.LENGTH_LONG).show();
                                       return;
                                   }

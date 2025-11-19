@@ -61,7 +61,7 @@ public class WarrantyAdapter extends RecyclerView.Adapter<WarrantyAdapter.VH> {
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         Warranty w = items.get(position);
-        holder.title.setText(!TextUtils.isEmpty(w.productName) ? w.productName : (w.companyName != null ? w.companyName : "Garantía"));
+        holder.title.setText(!TextUtils.isEmpty(w.productName) ? w.productName : (w.companyName != null ? w.companyName : ctx.getString(R.string.garant_a)));
 
         // Construir la cadena de fecha a mostrar
         StringBuilder fechaSb = new StringBuilder();
@@ -71,28 +71,28 @@ public class WarrantyAdapter extends RecyclerView.Adapter<WarrantyAdapter.VH> {
         Date invoiceDate = parseDateSafe(w.invoiceDate);
 
         if (startDate != null) {
-            fechaSb.append("Inicio: ").append(formatDate(startDate));
+            fechaSb.append(ctx.getString(R.string.inicio)).append(formatDate(startDate));
         } else if (invoiceDate != null) {
-            fechaSb.append("Fecha: ").append(formatDate(invoiceDate));
+            fechaSb.append(ctx.getString(R.string.fecha)).append(formatDate(invoiceDate));
         }
 
         Date endDate = parseDateSafe(w.warrantyEnd);
         if (endDate != null) {
             if (fechaSb.length() > 0) fechaSb.append(" | ");
-            fechaSb.append("Vence: ").append(formatDate(endDate));
+            fechaSb.append(ctx.getString(R.string.vence)).append(formatDate(endDate));
 
             // calcular meses restantes o vencida
             Date now = new Date();
             if (endDate.before(now)) {
-                fechaSb.append(" | Vencida");
+                fechaSb.append(ctx.getString(R.string.vencida));
             } else {
                 int monthsRem = monthsUntil(now, endDate);
                 if (monthsRem <= 0) {
                     // si queda menos de un mes, mostramos días restantes
                     long daysRem = daysBetween(now, endDate);
-                    fechaSb.append(" | Restan: ").append(daysRem).append(" día").append(daysRem == 1 ? "" : "s");
+                    fechaSb.append(ctx.getString(R.string.restan)).append(daysRem).append(ctx.getString(R.string.d_a)).append(daysRem == 1 ? "" : "s");
                 } else {
-                    fechaSb.append(" | Restan: ").append(monthsRem).append(" mes").append(monthsRem == 1 ? "" : "es");
+                    fechaSb.append(ctx.getString(R.string.restan)).append(monthsRem).append(ctx.getString(R.string.mes)).append(monthsRem == 1 ? "" : "es");
                 }
             }
         }

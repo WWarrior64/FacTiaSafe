@@ -193,10 +193,10 @@ public class InvoiceDAO {
                 }
             }db.setTransactionSuccessful();
             Log.d(TAG, "Factura insertada con ID: " + invoiceId + (hasWarranty ? " (con garantía)" : ""));
-            Toast.makeText(context, "Factura guardada exitosamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.factura_guardada_exitosamente, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Log.e(TAG, "Error al insertar factura: " + e.getMessage(), e);
-            Toast.makeText(context, "Error al guardar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getString(R.string.error_al_guardar2) + e.getMessage(), Toast.LENGTH_SHORT).show();
             invoiceId = -1;
         } finally {
             db.endTransaction();

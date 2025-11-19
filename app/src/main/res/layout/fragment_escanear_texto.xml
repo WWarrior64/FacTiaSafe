@@ -553,7 +553,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="24dp"
-                android:text="@string/fotografia_art"
+                android:text="@string/foto_producto"
                 android:textColor="?attr/colorOnSecondary"
                 android:textSize="16sp"
                 android:textStyle="bold"

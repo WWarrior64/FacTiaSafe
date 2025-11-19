@@ -45,7 +45,7 @@
     <string name="version_acercade">Version</string>
     <string name="version_acercade2">1.0.0</string>
     <string name="id_acercade">Internal ID</string>
-    <string name="id_acercade2">APP-2025-3F8D-1A2B</string>
+    <string name="id_acercade2">APP–2025–3F8D-1A2B</string>
     <string name="cancelar_3">Cancel</string>
     <string name="guardar_3">Save</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -86,7 +86,7 @@
     <string name="selecc_categoria">Select a category for this invoice</string>
     <string name="area_agregar">Tap to add</string>
     <string name="clausulas">e.g. Legal warranty conditions, return clauses, seller notes.</string>
-    <string name="compras_personales">Personal purchases</string>
+    <string name="compras_personales">None</string>
     <string name="ej_sucursal">e.g. Santa Ana Branch</string>
     <string name="notas_extras">Legal Notes / Extras</string>
     <string name="fotografia_art">Invoice photograph</string>
@@ -117,7 +117,7 @@
     <string name="fact_no_encontrada">Invoice not found</string>
     <string name="factura_borrada">Invoice deleted</string>
     <string name="error_borrar_factura">Error deleting invoice</string>
-    <string name="generando_pdf">Generating PDF...</string>
+    <string name="generando_pdf">Generating PDF…</string>
     <string name="pdf_guardado">"PDF saved: "</string>
     <string name="error_generando_pdf">Error generating PDF</string>
     <string name="perm_denegado">Permission denied: cannot save to public folder.</string>
@@ -135,7 +135,7 @@
     <string name="entrada_manual">Manual Entry</string>
     <string name="importar_pdf">Import PDF</string>
     <string name="escanear">Scan</string>
-    <string name="inicio_escaneo">Starting document scanner...</string>
+    <string name="inicio_escaneo">Starting document scanner…</string>
     <string name="categorias">Categories</string>
     <string name="gestion_cat">Category management</string>
     <string name="instrucciones_cat">Select the \'=\' icon to edit the category or tap \'⊖\' to delete</string>
@@ -254,9 +254,30 @@
     <string name="op_1_dia">1 day</string>
     <string name="garantia_proxima">Upcoming Warranty</string>
     <string name="unagarantia">A warranty</string>
+    <string name="recientes">Recent</string>
+    <string name="antiguos">Old</string>
+    <string name="este_mes">This month</string>
+    <string name="filtrando_por">"Filtering by: "</string>
+    <string name="garant_a">Warranty</string>
+    <string name="inicio">"Start: "</string>
+    <string name="fecha">"Date: "</string>
+    <string name="vence">"Expires: "</string>
+    <string name="vencida">" | Expired"</string>
+    <string name="restan">" | Remaining: "</string>
+    <string name="d_a">" day"</string>
+    <string name="mes">" month"</string>
+    <string name="ocr_no_detect_texto_intenta_con_mejor_iluminaci_n_o_acerca_la_c_mara">OCR did not detect text. Try with better lighting or bring the camera closer.</string>
+    <string name="factura_guardada_exitosamente">Invoice saved successfully</string>
+    <string name="error_al_guardar2">"Error saving: "</string>
+    <string name="factura_guardada_con_id">"Invoice saved with ID: "</string>
+    <string name="error_insertar_factura">Error inserting the invoice</string>
     <plurals name="garantiaexpiraen">
         <item quantity="zero">%1$s expires today.</item>
         <item quantity="one">%1$s expires in %2$d day.</item>
         <item quantity="other">%1$s expires in %2$d days.</item>
     </plurals>
+    <string-array name="tab_titles">
+        <item>Main Data</item>
+        <item>Extra Data</item>
+    </string-array>
 </resources>

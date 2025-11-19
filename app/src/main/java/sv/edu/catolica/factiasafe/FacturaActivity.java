@@ -3,6 +3,7 @@ package sv.edu.catolica.factiasafe;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -32,13 +33,19 @@ import com.google.android.material.color.MaterialColors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class FacturaActivity extends BaseActivity {
     private RecyclerView recyclerView;
     private Chip selectedChip;
     private List<Invoice> invoiceList = new ArrayList<>();
     private InvoiceAdapter adapter;
-    private String currentFilter = "A/Z";
+
+    private static final String FILTER_AZ = "A/Z";
+    private static final String FILTER_RECIENTES = "Recientes";
+    private static final String FILTER_ANTIGUOS = "Antiguos";
+    private static final String FILTER_MES = "Este mes";
+    private String currentFilter = FILTER_AZ;
 
     private android.os.Handler searchHandler = new android.os.Handler();
     private Runnable searchRunnable;
@@ -74,8 +81,8 @@ public class FacturaActivity extends BaseActivity {
             currentFilter = savedInstanceState.getString("current_filter", "A/Z");
         }
 
-        // Seleccionar el chip correspondiente
-        selectChipByFilter(currentFilter);
+        String filter = getFilterIdFromString(currentFilter);
+        selectChipByFilter(filter);
     }
 
     @Override
@@ -105,16 +112,17 @@ public class FacturaActivity extends BaseActivity {
         Chip chipAntiguos = findViewById(R.id.chip_antiguos);
         Chip chipEsteMes = findViewById(R.id.chip_este_mes);
 
-        chipAz.setOnClickListener(v -> handleChipClick((Chip) v, "A/Z"));
-        chipRecientes.setOnClickListener(v -> handleChipClick((Chip) v, "Recientes"));
-        chipAntiguos.setOnClickListener(v -> handleChipClick((Chip) v, "Antiguos"));
-        chipEsteMes.setOnClickListener(v -> handleChipClick((Chip) v, "Este mes"));
+        chipAz.setOnClickListener(v -> handleChipClick((Chip) v, FILTER_AZ, "A/Z"));
+        chipRecientes.setOnClickListener(v -> handleChipClick((Chip) v, FILTER_RECIENTES, getString(R.string.recientes)));
+        chipAntiguos.setOnClickListener(v -> handleChipClick((Chip) v, FILTER_ANTIGUOS, getString(R.string.antiguos)));
+        chipEsteMes.setOnClickListener(v -> handleChipClick((Chip) v, FILTER_MES, getString(R.string.este_mes)));
     }
 
-    private void handleChipClick(Chip chip, String filterType) {
+    private void handleChipClick(Chip chip, String filterConstant, String filterDisplayName) {
         handleChipSelection(chip);
-        Toast.makeText(this, "Filtrando por: " + filterType, Toast.LENGTH_SHORT).show();
-        loadInvoices(filterType); // Actualiza la lista con el filtro
+        currentFilter = filterConstant;
+        Toast.makeText(this, getString(R.string.filtrando_por) + filterDisplayName, Toast.LENGTH_SHORT).show();
+        loadInvoices(filterConstant); // Actualiza la lista con el filtro
     }
 
     private void handleChipSelection(Chip newSelectedChip) {
@@ -154,19 +162,39 @@ public class FacturaActivity extends BaseActivity {
         selectedChip = newSelectedChip;
     }
 
+    public String getStringFromLocale(Context context, int stringId, Locale locale) {
+        Configuration config = new Configuration(context.getResources().getConfiguration());
+        config.setLocale(locale);
+        Context localizedContext = context.createConfigurationContext(config);
+        return localizedContext.getResources().getString(stringId);
+    }
+
+    private String getFilterIdFromString(String filter) {
+        if (filter.equals(getStringFromLocale(this, R.string.recientes, new Locale("es", "ES"))))
+            return FILTER_RECIENTES;
+
+        if (filter.equals(getStringFromLocale(this, R.string.antiguos, new Locale("es", "ES"))))
+            return FILTER_ANTIGUOS;
+
+        if (filter.equals(getStringFromLocale(this, R.string.este_mes, new Locale("es", "ES"))))
+            return FILTER_MES;
+
+        return FILTER_AZ;
+    }
+    
     private void selectChipByFilter(String filter) {
         Chip chipToSelect = null;
         switch (filter) {
-            case "A/Z":
+            case FILTER_AZ:
                 chipToSelect = findViewById(R.id.chip_az);
                 break;
-            case "Recientes":
+            case FILTER_RECIENTES:
                 chipToSelect = findViewById(R.id.chip_recientes);
                 break;
-            case "Antiguos":
+            case FILTER_ANTIGUOS:
                 chipToSelect = findViewById(R.id.chip_antiguos);
                 break;
-            case "Este mes":
+            case FILTER_MES:
                 chipToSelect = findViewById(R.id.chip_este_mes);
                 break;
         }
@@ -208,13 +236,13 @@ public class FacturaActivity extends BaseActivity {
         String whereClause = "";
         String orderBy = "";
 
-        if (filter.equals("A/Z")) {
+        if (filter.equals(FILTER_AZ)) {
             orderBy = "company_name ASC";
-        } else if (filter.equals("Recientes")) {
+        } else if (filter.equals(FILTER_RECIENTES)) {
             orderBy = "date DESC";
-        } else if (filter.equals("Antiguos")) {
+        } else if (filter.equals(FILTER_ANTIGUOS)) {
             orderBy = "date ASC";
-        } else if (filter.equals("Este mes")) {
+        } else if (filter.equals(FILTER_MES)) {
             whereClause = " WHERE strftime('%Y-%m', i.date) = strftime('%Y-%m', 'now')";
             orderBy = "date DESC";
         }
