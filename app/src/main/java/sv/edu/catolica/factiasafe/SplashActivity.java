@@ -34,10 +34,14 @@ import java.util.concurrent.TimeUnit;
 public class SplashActivity extends Activity {
 
     private static final int REQ_POST_NOTIFICATIONS = 1001;
+    private static final int REQ_STORAGE = 1002;
+    private static final int REQ_CAMERA = 1003;
     private static final long SPLASH_DELAY_MS = 4000;
 
     private static final String PREF_ASKED_BATTERY_OPT = "asked_battery_optimization";
     private static final String PREF_ASKED_AUTOSTART = "asked_autostart";
+    private static final String PREF_ASKED_STORAGE = "asked_storage";
+    private static final String PREF_ASKED_CAMERA = "asked_camera";
 
     private SharedPreferences prefs;
     private Handler splashHandler = new Handler();
@@ -81,8 +85,8 @@ public class SplashActivity extends Activity {
             if (!askedAutostart) {
                 showAutostartDialog();
             } else {
-                // 3. Si ambos fueron preguntados, continuar la app
-                continueToAppWithDelay();
+                // 3. Si ambos fueron preguntados, pedir permisos nativos de Android
+                requestPermissionsIfNeeded();
             }
         }
 
@@ -107,9 +111,58 @@ public class SplashActivity extends Activity {
         // Si ya preguntamos por ambos permisos, AHORA podemos continuar.
         if (askedBatteryOpt && askedAutostart) {
             isAppFlowStarted = true; // Marcar para evitar reejecución
-            continueToAppWithDelay();
+            requestPermissionsIfNeeded();
         }
         // Si solo se ha preguntado por uno, el onCreate/dialog ya lo está manejando.
+    }
+
+    private void requestPermissionsIfNeeded() {
+        // Pedir almacenamiento primero
+        boolean askedStorage = prefs.getBoolean(PREF_ASKED_STORAGE, false);
+        if (!askedStorage) {
+            requestStoragePermission();
+            return;
+        }
+
+        // Luego pedir cámara
+        boolean askedCamera = prefs.getBoolean(PREF_ASKED_CAMERA, false);
+        if (!askedCamera) {
+            requestCameraPermission();
+            return;
+        }
+
+        // Si ambos fueron preguntados, continuar
+        continueToAppWithDelay();
+    }
+
+    private void requestStoragePermission() {
+        prefs.edit().putBoolean(PREF_ASKED_STORAGE, true).apply();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+: usar READ_MEDIA_IMAGES, READ_MEDIA_VIDEO
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            android.Manifest.permission.READ_MEDIA_IMAGES,
+                            android.Manifest.permission.READ_MEDIA_VIDEO
+                    },
+                    REQ_STORAGE);
+        } else {
+            // Android 6-12: usar READ_EXTERNAL_STORAGE y WRITE_EXTERNAL_STORAGE
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    },
+                    REQ_STORAGE);
+        }
+    }
+
+    private void requestCameraPermission() {
+        prefs.edit().putBoolean(PREF_ASKED_CAMERA, true).apply();
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{android.Manifest.permission.CAMERA},
+                REQ_CAMERA);
     }
 
     // --- DIÁLOGO 1: OPTIMIZACIÓN ESTÁNDAR (DOZE) ---
@@ -159,8 +212,8 @@ public class SplashActivity extends Activity {
                     // Marcar como preguntado para no molestar más
                     prefs.edit().putBoolean(PREF_ASKED_AUTOSTART, true).apply();
                     dialog.dismiss();
-                    // Si el usuario omite el último permiso, AHORA sí podemos continuar la App.
-                    continueToAppWithDelay();
+                    // Pedir los permisos nativos de Android
+                    requestPermissionsIfNeeded();
                 })
                 .setCancelable(false)
                 .show();
@@ -252,6 +305,31 @@ public class SplashActivity extends Activity {
                 // Denegado -> el usuario siempre puede activarlo manualmente en settings
                 Toast.makeText(this, R.string.permiso_notificaciones_noconcedido, Toast.LENGTH_LONG).show();
             }
+            return;
+        }
+
+        // Manejar permiso de almacenamiento
+        if (requestCode == REQ_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permiso de almacenamiento concedido", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+            }
+            // Pedir siguiente permiso
+            requestPermissionsIfNeeded();
+            return;
+        }
+
+        // Manejar permiso de cámara
+        if (requestCode == REQ_CAMERA) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permiso de cámara concedido", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
+            }
+            // Continuar la app
+            continueToAppWithDelay();
+            return;
         }
     }
 
